@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Book, Person, BookLoan
+from .forms import BookLoanForm
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -17,6 +18,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 @admin.register(BookLoan)
 class BookLoanAdmin(admin.ModelAdmin):
+    form = BookLoanForm
     list_display = ('book', 'person', 'loan_date', 'return_date')
     search_fields = ('book__title', 'person__name')
     list_filter = ('loan_date', 'return_date')

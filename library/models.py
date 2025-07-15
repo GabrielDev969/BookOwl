@@ -5,7 +5,7 @@ class Book(models.Model):
     class StatusBook(models.TextChoices):
         AVAILABLE = 'available', 'Disponível'
         UNAVAILABLE = 'unavailable', 'Indisponível'
-        CHECKED_OUT = 'checked_out', 'Checked Out'
+        CHECKED_OUT = 'checked_out', 'Emprestado'
         RESERVED = 'reserved', 'Reservado'
 
     title = models.CharField(max_length=200)

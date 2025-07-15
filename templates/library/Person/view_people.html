@@ -1,0 +1,50 @@
+{% extends 'index.html' %}
+{% block title %}| Peoples Library{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-4 text-center">Lista de Pessoas</h1>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for person in peoples %}
+    <div class="col">
+      <a href="{% url 'library:details_people' person.id %}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm border-0 bg-light">
+          <div class="card-body">
+            <h5 class="card-title mb-1">{{ person.name }}</h5>
+            <p class="card-text text-muted mb-2"><strong>E-mail:</strong> {{ person.email }}</p>
+            {% if person.phone %}
+            <p class="card-text text-muted mb-2"><strong>Telefone:</strong> {{ person.phone }}</p>
+            {% endif %}
+            <p class="card-text"><strong>Endereço:</strong> {{ person.address|truncatewords:20 }}</p>
+            <p class="card-text text-muted"><strong>Criado em:</strong> {{ person.created_at|date:"d/m/Y H:i" }}</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% empty %}
+    <div class="col">
+      <p class="text-center text-muted">Nenhuma pessoa encontrada.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  /* Hover no card */
+  .card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Responsividade */
+  @media (max-width: 576px) {
+    .card-title {
+      font-size: 1.1rem;
+    }
+    .card-text {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+{% endblock %}

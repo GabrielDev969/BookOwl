@@ -6,4 +6,8 @@ app_name = 'library'
 urlpatterns = [
     path('books/', views.view_books, name='view_books'),
     path('books/<int:book_id>/', views.details_book, name='details_book'),
+    path('people/', views.view_peoples, name='view_peoples'),
+    path('people/<int:person_id>/', views.details_people, name='details_people'),
+    path('loans/', views.view_loans, name='view_loans'),
+    path('loans/<int:loan_id>/', views.details_loan, name='details_loan'),
 ]

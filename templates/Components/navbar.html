@@ -11,8 +11,15 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">Dashboard</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'library:view_books' %}">Biblioteca</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="libraryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Biblioteca
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="libraryDropdown">
+                            <li><a class="dropdown-item" href="{% url 'library:view_books' %}">Livros</a></li>
+                            <li><a class="dropdown-item" href="{% url 'library:view_books' %}">Pessoas</a></li>
+                            <li><a class="dropdown-item" href="{% url 'library:view_books' %}">Emprestimos</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'profile' %}">Perfil</a>
@@ -46,8 +53,23 @@
     transition: color 0.2s ease-in-out;
 }
 
-/* Efeito de hover continua o mesmo */
+/* Efeito de hover */
 .btn-icon-logout:hover {
     color: #dc3545; /* Cor vermelha (danger do Bootstrap) */
+}
+
+/* Ajuste para o dropdown em telas pequenas */
+@media (max-width: 991px) {
+    .dropdown-menu {
+        background-color: #343a40; /* Mesma cor da navbar (bg-dark) */
+        border: none;
+    }
+    .dropdown-item {
+        color: #f8f9fa; /* Cor do texto da navbar (light) */
+    }
+    .dropdown-item:hover {
+        background-color: #495057; /* Cor de fundo ao passar o mouse */
+        color: #ffffff;
+    }
 }
 </style>

@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # My apps
     'User.apps.UserConfig',
     'Home',
+    'library',
 ]
 
 MIDDLEWARE = [

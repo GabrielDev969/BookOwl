@@ -1,4 +1,5 @@
-# BookOwl
+# BookOwl<img width="500" height="500" alt="favicon BookOwl(3)" src="https://github.com/user-attachments/assets/743d47c6-1f72-4002-9d1a-87f02fba6b67" />
+
 
 ![Badge em Produção](http://img.shields.io/static/v1?label=STATUS&message=EM%20DESENVOLVIMENTO&color=GREEN&style=for-the-badge)
 ![Badge em Versão](http://img.shields.io/static/v1?label=Versão&message=1.0.0&color=GREEN&style=for-the-badge)

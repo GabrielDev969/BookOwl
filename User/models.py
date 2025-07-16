@@ -3,10 +3,11 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from library.models import Library
 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
-
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, null=True, blank=True, related_name='users')
     def __str__(self):
         return self.username
     

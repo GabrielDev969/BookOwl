@@ -46,8 +46,25 @@ def details_people(request, person_id):
     return render(request, 'library/Person/details_people.html', context={'person': person})
 
 def view_loans(request):
-    loans = BookLoan.objects.all()
-    return render(request, 'library/BookLoan/view_loans.html', context={'loans': loans})
+    if not request.user.library:
+        messages.warning(request, "Você precisa estar associado a uma biblioteca para ver os empréstimos.")
+        loans = BookLoan.objects.none()
+        form = BookLoanForm(user=request.user)
+        return render(request, 'library/loan/view_loans.html', context={'loans': loans, 'form': form})
+
+    if request.method == 'POST':
+        form = BookLoanForm(request.POST, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Empréstimo criado com sucesso!")
+            return redirect('library:view_loans')
+        else:
+            messages.error(request, "Erro ao criar empréstimo. Verifique os dados e tente novamente.")
+    else:
+        form = BookLoanForm(user=request.user)
+
+    loans = BookLoan.objects.filter(library=request.user.library)
+    return render(request, 'library/BookLoan/view_loans.html', context={'loans': loans, 'form': form})
 
 def details_loan(request, loan_id):
     loan = get_object_or_404(BookLoan, id=loan_id)

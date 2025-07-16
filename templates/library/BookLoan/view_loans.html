@@ -4,14 +4,24 @@
 {% block content %}
 <div class="container py-4">
   <h1 class="mb-4 text-center">Lista de Empréstimos</h1>
-  <!-- Botão para abrir o modal -->
-  {% if request.user.library %}
-  <div class="mb-4 text-end">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createLoanModal">
-      Criar Novo Empréstimo
-    </button>
+  <div class="row mb-4 justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <form method="get" class="d-flex align-items-center gap-2">
+        <div class="input-group shadow-sm">
+          <span class="input-group-text bg-white border-0"><i class="fas fa-search text-muted"></i></span>
+          <input type="text" name="search" class="form-control border-0" placeholder="Pesquisar por título ou autor" value="{{ query|default_if_none:'' }}" style="border-radius: 50px;">
+        </div>
+        <button type="submit" class="btn btn-primary rounded-pill px-4">
+          <i class="fas fa-search me-2"></i>
+        </button>
+        {% if request.user.library %}
+          <button type="button" class="btn btn-success rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#createLoanModal">
+            <i class="fas fa-plus"></i>
+          </button>
+        {% endif %}
+      </form>
+    </div>
   </div>
-  {% endif %}
   <!-- Lista de Empréstimos -->
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {% for loan in loans %}
@@ -47,6 +57,48 @@
     </div>
     {% endfor %}
   </div>
+  <!-- Paginação -->
+  {% if loans.has_other_pages %}
+  <nav aria-label="Paginação de livros" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if loans.has_previous %}
+        <li class="page-item">
+          <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ loans.previous_page_number }}" aria-label="Anterior">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link rounded-pill"><i class="fas fa-chevron-left"></i></span>
+        </li>
+      {% endif %}
+      
+      {% for num in loans.paginator.page_range %}
+        {% if loans.number == num %}
+          <li class="page-item active">
+            <span class="page-link rounded-pill">{{ num }}</span>
+          </li>
+        {% elif num > loans.number|add:'-3' and num < loans.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      
+      {% if loans.has_next %}
+        <li class="page-item">
+          <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ loans.next_page_number }}" aria-label="Próximo">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link rounded-pill"><i class="fas fa-chevron-right"></i></span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
   <!-- Modal para Criar Empréstimo -->
   {% if request.user.library %}
   <div class="modal fade" id="createLoanModal" tabindex="-1" aria-labelledby="createLoanModalLabel" aria-hidden="true">

@@ -1,9 +1,28 @@
 {% extends 'index.html' %}
-{% block title %}| Peoples Library{% endblock %}
+{% block title %}| Lista de Pessoas{% endblock %}
 
 {% block content %}
 <div class="container py-4">
   <h1 class="mb-4 text-center">Lista de Pessoas</h1>
+  <div class="row mb-4 justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <form method="get" class="d-flex align-items-center gap-2">
+        <div class="input-group shadow-sm">
+          <span class="input-group-text bg-white border-0"><i class="fas fa-search text-muted"></i></span>
+          <input type="text" name="search" class="form-control border-0" placeholder="Pesquisar por título ou autor" value="{{ query|default_if_none:'' }}" style="border-radius: 50px;">
+        </div>
+        <button type="submit" class="btn btn-primary rounded-pill px-4">
+          <i class="fas fa-search me-2"></i>
+        </button>
+        {% if request.user.library %}
+          <button type="button" class="btn btn-success rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#createPersonModal">
+            <i class="fas fa-plus"></i>
+          </button>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+  <!-- Lista de Pessoas -->
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {% for person in peoples %}
     <div class="col">
@@ -27,24 +46,134 @@
     </div>
     {% endfor %}
   </div>
+  <!-- Paginação -->
+  {% if peoples.has_other_pages %}
+  <nav aria-label="Paginação de Pessoas" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if peoples.has_previous %}
+        <li class="page-item">
+          <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ peoples.previous_page_number }}" aria-label="Anterior">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link rounded-pill"><i class="fas fa-chevron-left"></i></span>
+        </li>
+      {% endif %}
+      
+      {% for num in peoples.paginator.page_range %}
+        {% if peoples.number == num %}
+          <li class="page-item active">
+            <span class="page-link rounded-pill">{{ num }}</span>
+          </li>
+        {% elif num > peoples.number|add:'-3' and num < peoples.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      
+      {% if peoples.has_next %}
+        <li class="page-item">
+          <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ peoples.next_page_number }}" aria-label="Próximo">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link rounded-pill"><i class="fas fa-chevron-right"></i></span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+  <!-- Modal para Cadastrar Pessoa -->
+  {% if request.user.library %}
+  <div class="modal fade" id="createPersonModal" tabindex="-1" aria-labelledby="createPersonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createPersonModalLabel">Cadastrar Nova Pessoa</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" id="createPersonForm">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="{{ form.name.id_for_label }}" class="form-label">Nome</label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="text-danger small mt-1">
+                  {% for error in form.name.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <label for="{{ form.email.id_for_label }}" class="form-label">E-mail</label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                <div class="text-danger small mt-1">
+                  {% for error in form.email.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <label for="{{ form.phone.id_for_label }}" class="form-label">Telefone (opcional)</label>
+              {{ form.phone }}
+              {% if form.phone.errors %}
+                <div class="text-danger small mt-1">
+                  {% for error in form.phone.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <label for="{{ form.address.id_for_label }}" class="form-label">Endereço</label>
+              {{ form.address }}
+              {% if form.address.errors %}
+                <div class="text-danger small mt-1">
+                  {% for error in form.address.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            {% if form.non_field_errors %}
+              <div class="text-danger small mb-3">
+                {% for error in form.non_field_errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Cadastrar Pessoa</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
 
 <style>
-  /* Hover no card */
   .card:hover {
     transform: translateY(-5px);
     transition: transform 0.2s ease-in-out;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
   }
-
-  /* Responsividade */
   @media (max-width: 576px) {
-    .card-title {
-      font-size: 1.1rem;
-    }
-    .card-text {
-      font-size: 0.9rem;
-    }
+    .card-title { font-size: 1.1rem; }
+    .card-text { font-size: 0.9rem; }
+    .btn-primary, .btn-secondary { width: 100%; border-radius: 50px !important; }
+    .d-flex { flex-direction: column; gap: 10px !important; }
   }
 </style>
 {% endblock %}

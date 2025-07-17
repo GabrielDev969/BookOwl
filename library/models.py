@@ -40,12 +40,44 @@ class Person(models.Model):
         return self.name
     
 class BookLoan(models.Model):
+
+    class StatusLoan(models.TextChoices):
+        ACTIVE = 'active', 'Ativo'
+        OVERDUE = 'overdue', 'Atrasado'
+        RETURNED = 'returned', 'Devolvido'
+        CANCELLED = 'cancelled', 'Cancelado'
+
+    cd_bookloan = models.PositiveIntegerField(
+        editable=False,
+        verbose_name='N° do Empréstimo',
+    )
+
     library = models.ForeignKey(Library, on_delete=models.CASCADE)
     books = models.ManyToManyField(Book, related_name='loans')
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     loan_date = models.DateTimeField(auto_now_add=True)
     return_date = models.DateTimeField(blank=True, null=True)
+    date_previous_return = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(
+        max_length=20,
+        choices=StatusLoan.choices,
+        default=StatusLoan.ACTIVE,
+    )
+
+    class Meta:
+        unique_together = ('library', 'cd_bookloan')
+        ordering = ['-cd_bookloan']
 
     def __str__(self):
         book_title = ", ".join(book.title for book in self.book.all())
         return f"{book_title} loaned to {self.person.name}"
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            last_loan = BookLoan.objects.filter(library=self.library).order_by('-cd_bookloan').first()
+
+            if last_loan:
+                self.cd_bookloan = last_loan.cd_bookloan + 1
+            else:
+                self.cd_bookloan = 1
+        super().save(*args, **kwargs)

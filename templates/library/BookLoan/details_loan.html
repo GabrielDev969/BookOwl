@@ -9,6 +9,9 @@
         <div class="card-body p-4">
           <h2 class="card-title mb-3" style="color: #040404; font-weight: 600;">Empréstimo</h2>
           <p class="card-text mb-2" style="color: #040404; font-weight: 500;">
+            <strong>Código de Empréstimo:</strong> X000{{ loan.cd_bookloan }}
+          </p>
+          <p class="card-text mb-2" style="color: #040404; font-weight: 500;">
             <strong>Livro(s):</strong>
             {% for book in loan.books.all %}
               {{ book.title }}{% if not forloop.last %}, {% endif %}
@@ -27,6 +30,14 @@
           <p class="card-text mb-2" style="color: #040404;"><strong>Pessoa:</strong> {{ loan.person.name }}</p>
           <p class="card-text mb-2" style="color: #040404;"><strong>Data de Empréstimo:</strong> {{ loan.loan_date|date:"d/m/Y H:i" }}</p>
           <p class="card-text mb-2" style="color: #040404; opacity: 0.7;">
+            <strong>Data Prevista de Devolução:</strong> 
+            {% if loan.date_previous_return %}
+              {{ loan.date_previous_return|date:"d/m/Y H:i" }}
+            {% else %}
+              Não definida
+            {% endif %}
+          </p>
+          <p class="card-text mb-2" style="color: #040404; opacity: 0.7;">
             <strong>Data de Devolução:</strong> 
             {% if loan.return_date %}
               {{ loan.return_date|date:"d/m/Y H:i" }}
@@ -36,8 +47,8 @@
           </p>
           <p class="card-text mb-4" style="color: #040404;">
             <strong>Status do Empréstimo:</strong> 
-            <i class="fas fa-circle me-1" style="{% if loan.status_loan == 'available' %}color: #28a745;{% elif loan.status_loan == 'reserved' %}color: #e0a673;{% elif loan.status_loan == 'unavailable' %}color: #dc3545;{% else %}color: #e17122;{% endif %}"></i>
-            {{ loan.get_status_loan_display }}
+            <i class="fas fa-circle me-1" style="{% if loan.status == 'returned' %}color: #28a745;{% elif loan.status == 'overdue' %}color: #e0a673;{% elif loan.status == 'cancelled' %}color: #dc3545;{% else %}color: #e17122;{% endif %}"></i>
+            <small style="color: #040404; opacity: 0.7;">{{ loan.get_status_display }}</small>
           </p>
           <div class="d-flex gap-2">
             <a href="{% url 'library:view_loans' %}" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">Voltar para a Lista</a>

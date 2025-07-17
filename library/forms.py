@@ -1,6 +1,7 @@
 from django import forms
 from .models import Book, Person, BookLoan
 from django.db import models
+from django.utils import timezone
 
 class BookForm(forms.ModelForm):
     class Meta:
@@ -49,7 +50,7 @@ class PersonForm(forms.ModelForm):
         return person
 
 class BookLoanForm(forms.ModelForm):
-    status_loan = forms.ChoiceField(
+    status_book = forms.ChoiceField(
         choices=[
             ('checked_out', 'Emprestado'),
             ('reserved', 'Reservado'),
@@ -60,11 +61,11 @@ class BookLoanForm(forms.ModelForm):
 
     class Meta:
         model = BookLoan
-        fields = ['books', 'person', 'return_date']
+        fields = ['books', 'person', 'date_previous_return']
         widgets = {
             'books': forms.SelectMultiple(attrs={'class': 'form-control'}),
             'person': forms.Select(attrs={'class': 'form-select'}),
-            'return_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'date_previous_return': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
         }
 
     def __init__(self, *args, user=None, **kwargs):
@@ -86,14 +87,14 @@ class BookLoanForm(forms.ModelForm):
         cleaned_data = super().clean()
         books = cleaned_data.get('books')
         person = cleaned_data.get('person')
-        return_date = cleaned_data.get('return_date')
+        date_previous_return = cleaned_data.get('date_previous_return')
 
         if self.user and hasattr(self.user, 'library') and self.user.library:
             if books:
                 for book in books:
                     if book.library != self.user.library:
                         raise forms.ValidationError(f"O livro '{book.title}' não pertence à sua biblioteca.")
-                    if not return_date and BookLoan.objects.filter(
+                    if BookLoan.objects.filter(
                         books=book, return_date__isnull=True
                     ).exclude(pk=self.instance.pk).exists():
                         raise forms.ValidationError(f"O livro '{book.title}' já está emprestado ou reservado e não foi devolvido.")
@@ -103,18 +104,21 @@ class BookLoanForm(forms.ModelForm):
         if self.instance and self.instance.pk and self.instance.return_date:
             raise forms.ValidationError("Este empréstimo não pode ser editado porque a data de devolução já foi definida.")
         
+        if date_previous_return and date_previous_return < timezone.now():
+            raise forms.ValidationError("A data prevista de devolução deve ser no futuro.")
+
         return cleaned_data
 
     def save(self, commit=True):
         loan = super().save(commit=False)
         if self.user and hasattr(self.user, 'library') and self.user.library:
             loan.library = self.user.library
-        loan.status_loan = self.cleaned_data['status_loan'] if not self.cleaned_data['return_date'] else 'available'
+        loan.status_book = self.cleaned_data['status_book']
         if commit:
             loan.save()
             if self.cleaned_data['books']:
                 loan.books.set(self.cleaned_data['books'])
                 for book in self.cleaned_data['books']:
-                    book.status = loan.status_loan
+                    book.status = loan.status_book
                     book.save()
         return loan

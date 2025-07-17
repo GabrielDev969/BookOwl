@@ -10,9 +10,9 @@ from .forms import BookForm, PersonForm, BookLoanForm
 def view_books(request):
     query = request.GET.get('search', '')
     if query:
-        books = Book.objects.filter(title__icontains=query, library=request.user.library)  | Book.objects.filter(author__icontains=query, library=request.user.library)
+        books = Book.objects.filter(title__icontains=query, library=request.user.library).order_by('title')  | Book.objects.filter(author__icontains=query, library=request.user.library).order_by('title')
     else:
-        books = Book.objects.filter(library=request.user.library)
+        books = Book.objects.filter(library=request.user.library).order_by('title')
 
     paginator = Paginator(books, 30) 
     page = request.GET.get('page')
@@ -51,9 +51,9 @@ def view_peoples(request):
     
     query = request.GET.get('search', '')
     if query:
-        people = Person.objects.filter(name__icontains=query, library=request.user.library)
+        people = Person.objects.filter(name__icontains=query, library=request.user.library).order_by('name')
     else:
-        people = Person.objects.filter(library=request.user.library)
+        people = Person.objects.filter(library=request.user.library).order_by('name')
 
     paginator = Paginator(people, 30) 
     page = request.GET.get('page')
@@ -96,9 +96,9 @@ def view_loans(request):
             Q(books__title__icontains=query)   | Q(books__author__icontains=query) |
             Q(person__name__icontains=query),
             library=request.user.library
-        )
+        ).order_by('created_at')
     else:
-        loan = BookLoan.objects.filter(library=request.user.library)
+        loan = BookLoan.objects.filter(library=request.user.library).order_by('created_at')
 
     paginator = Paginator(loan, 30) 
     page = request.GET.get('page')

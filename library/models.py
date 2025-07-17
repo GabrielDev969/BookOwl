@@ -45,6 +45,7 @@ class BookLoan(models.Model):
         ACTIVE = 'active', 'Ativo'
         OVERDUE = 'overdue', 'Atrasado'
         RETURNED = 'returned', 'Devolvido'
+        RESERVED = 'reserved', 'Reservado'
         CANCELLED = 'cancelled', 'Cancelado'
 
     cd_bookloan = models.PositiveIntegerField(

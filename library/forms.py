@@ -82,6 +82,14 @@ class BookLoanForm(forms.ModelForm):
                 models.Q(library=self.user.library, status='available') | models.Q(id__in=self.instance.books.all())
             )
             self.fields['person'].widget.attrs['disabled'] = True
+            self.fields['books'].widget.attrs['disabled'] = True
+            # Tornar books e person opcionais na edição
+            self.fields['books'].required = False
+            self.fields['person'].required = False
+            # Garantir que status_book reflita o status do primeiro livro
+            if self.instance.books.exists():
+                first_book = self.instance.books.first()
+                self.fields['status_book'].initial = first_book.status
 
     def clean(self):
         cleaned_data = super().clean()
@@ -90,6 +98,9 @@ class BookLoanForm(forms.ModelForm):
         date_previous_return = cleaned_data.get('date_previous_return')
 
         if self.user and hasattr(self.user, 'library') and self.user.library:
+            # Na edição, usar os livros existentes se books não for fornecido
+            if self.instance and self.instance.pk and not books:
+                books = self.instance.books.all()
             if books:
                 for book in books:
                     if book.library != self.user.library:
@@ -98,6 +109,9 @@ class BookLoanForm(forms.ModelForm):
                         books=book, return_date__isnull=True
                     ).exclude(pk=self.instance.pk).exists():
                         raise forms.ValidationError(f"O livro '{book.title}' já está emprestado ou reservado e não foi devolvido.")
+            # Na edição, usar a pessoa existente se person não for fornecido
+            if self.instance and self.instance.pk and not person:
+                person = self.instance.person
             if person and person.library != self.user.library:
                 raise forms.ValidationError("A pessoa selecionada não pertence à sua biblioteca.")
         
@@ -107,6 +121,9 @@ class BookLoanForm(forms.ModelForm):
         if date_previous_return and date_previous_return < timezone.now():
             raise forms.ValidationError("A data prevista de devolução deve ser no futuro.")
 
+        # Atualizar cleaned_data com os valores existentes, se necessário
+        cleaned_data['books'] = books
+        cleaned_data['person'] = person
         return cleaned_data
 
     def save(self, commit=True):
@@ -116,9 +133,11 @@ class BookLoanForm(forms.ModelForm):
         loan.status_book = self.cleaned_data['status_book']
         if commit:
             loan.save()
+            # Na criação, definir os livros; na edição, manter os existentes
             if self.cleaned_data['books']:
                 loan.books.set(self.cleaned_data['books'])
-                for book in self.cleaned_data['books']:
-                    book.status = loan.status_book
-                    book.save()
+            # Atualizar o status de todos os livros associados
+            for book in loan.books.all():
+                book.status = loan.status_book
+                book.save()
         return loan

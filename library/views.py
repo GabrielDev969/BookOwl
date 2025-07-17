@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import BookForm, PersonForm, BookLoanForm
+from django.utils import timezone
 
 @login_required
 def view_books(request):
@@ -126,4 +127,49 @@ def view_loans(request):
 @login_required
 def details_loan(request, loan_id):
     loan = get_object_or_404(BookLoan, id=loan_id)
-    return render(request, 'library/BookLoan/details_loan.html', context={'loan': loan})
+    
+    if request.method == 'POST':
+        form = BookLoanForm(request.POST, instance=loan, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Empréstimo atualizado com sucesso!")
+            return redirect('library:details_loan', loan_id=loan.id)
+        else:
+            messages.error(request, "Erro ao atualizar empréstimo. Verifique os dados e tente novamente.")
+    else:
+        form = BookLoanForm(instance=loan, user=request.user)
+
+    return render(request, 'library/BookLoan/details_loan.html', context={'loan': loan, 'form': form})
+
+@login_required
+def returned_loan(request, loan_id):
+    loan = get_object_or_404(BookLoan, id=loan_id)
+
+    if request.method == 'POST':
+        loan.status = BookLoan.StatusLoan.RETURNED
+        loan.return_date = timezone.now()
+        loan.books.update(status=Book.StatusBook.AVAILABLE)
+        if not loan.date_previous_return:
+            loan.date_previous_return = timezone.now()
+        loan.save()
+        messages.success(request, "Empréstimo devolvido com sucesso!")
+        return redirect('library:view_loans')
+    else:
+        messages.error(request, "Erro ao devolver o empréstimo. Tente novamente.")
+    return redirect('library:details_loan', loan_id=loan_id) 
+
+@login_required
+def cancel_loan(request, loan_id):
+    loan = get_object_or_404(BookLoan, id=loan_id)
+
+    if request.method == 'POST':
+        loan.status = BookLoan.StatusLoan.CANCELLED
+        loan.books.update(status=Book.StatusBook.AVAILABLE)
+        loan.save()
+        messages.success(request, "Empréstimo cancelado com sucesso!")
+        return redirect('library:view_loans')
+    else:
+        messages.error(request, "Erro ao cancelar o empréstimo. Tente novamente.")
+    
+    return redirect('library:details_loan', loan_id=loan_id)
+    

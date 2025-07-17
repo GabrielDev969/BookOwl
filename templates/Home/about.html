@@ -1,0 +1,185 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %} | Sobre o BookOwl{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Hero Section -->
+  <section class="text-center mb-5 animate-section">
+    <h1 class="mb-3" style="color: #040404; font-weight: 600;">Sobre o BookOwl</h1>
+    <p class="lead mb-4" style="color: #040404; opacity: 0.7; max-width: 600px; margin: 0 auto;">
+      Conheça a história por trás do BookOwl, um sistema criado para transformar o gerenciamento de bibliotecas.
+    </p>
+  </section>
+
+  <!-- Project Story Section -->
+  <section class="mb-5">
+    <h2 class="text-center mb-4" style="color: #040404; font-weight: 600;">Nossa História</h2>
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8">
+        <div class="card shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px;">
+          <div class="card-body p-4">
+            <p class="card-text" style="color: #040404; font-size: 1rem;">
+              O BookOwl nasceu de uma necessidade real: ajudar uma irmã da nossa igreja a organizar e gerenciar a biblioteca local de maneira mais eficiente. O que começou como uma solução para um desafio específico evoluiu para um sistema robusto e intuitivo, projetado para atender bibliotecas de igrejas, pequenas instituições e qualquer organização que precise controlar empréstimos de livros.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="text-center mb-5">
+    <h2 class="mb-4" style="color: #040404; font-weight: 600;">Nossa Missão</h2>
+    <p class="mb-4" style="color: #040404; opacity: 0.7; max-width: 700px; margin: 0 auto;">
+      Queremos ajudar bibliotecas de igrejas e instituições a gerenciar seus livros com facilidade, oferecendo uma plataforma que combina tecnologia moderna com simplicidade, permitindo que mais pessoas tenham acesso à leitura e ao conhecimento.
+    </p>
+    <a href="{% url 'signup' %}" class="btn rounded-pill px-4" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">
+      <i class="fas fa-user-plus me-2"></i>Junte-se ao BookOwl
+    </a>
+  </section>
+
+    <!-- Open Source Section -->
+  <section class="text-center mb-5">
+    <h2 class="mb-4" style="color: #040404; font-weight: 600;">Open Source</h2>
+    <p class="mb-4" style="color: #040404; opacity: 0.7; max-width: 700px; margin: 0 auto;">
+      Nosso código é aberto e acessível a todos, permitindo que outros desenvolvedores contribuam e aprimorem o sistema. Acreditamos que a colaboração é fundamental para criar soluções melhores e mais adaptáveis às necessidades de cada comunidade.
+    </p>
+    <a href="https://github.com/GabrielDev969/BookOwl" target="_blank" rel="noopener noreferrer" class="btn rounded-pill px-4" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">
+        <i class="fab fa-github me-2"></i>Contribua no GitHub
+    </a>
+  </section>
+
+  <!-- Developer Bio Section -->
+  <section class="text-center mb-5">
+    <h2 class="mb-4" style="color: #040404; font-weight: 600;">Sobre o Desenvolvedor</h2>
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px;">
+          <a href="#developerDetails" data-bs-toggle="collapse" aria-expanded="false" aria-controls="developerDetails" class="text-decoration-none">
+            <div class="card-body text-center p-4">
+              <img src="https://github.com/GabrielDev969.png" alt="Desenvolvedor" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #e17122;">
+              <h5 class="card-title mb-2" style="color: #040404; font-weight: 600;">Gabriel Santos</h5>
+              <p class="card-text" style = "color: #040404; opacity: 0.7;">Desenvolvedor</p>
+            </div>
+          </a>
+          <div class="collapse" id="developerDetails">
+            <div class="card-body" style="background-color: #f5f3e0; border-top: 1px solid #e0a673;">
+              <p class="card-text mb-3" style="color: #040404; font-size: 0.95rem;">
+                Sou um desenvolvedor apaixonado por criar sistemas que simplificam e otimizam o trabalho das pessoas. Com o BookOwl, busco oferecer uma solução prática para bibliotecas, e a cada dia trabalho para desenvolver ferramentas que façam a diferença na vida dos usuários.
+              </p>
+              <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" class="btn rounded-pill px-3" style="background-color: #e17122; color: #faf8e9;">
+                  <i class="fab fa-github me-2"></i>GitHub
+                </a>
+                <a href="https://www.linkedin.com/in/gabriel-santos-b53632196/" target="_blank" rel="noopener noreferrer" class="btn rounded-pill px-3" style="background-color: #e17122; color: #faf8e9;">
+                  <i class="fab fa-linkedin me-2"></i>LinkedIn
+                </a>
+                {% comment %} <a href="https://youtube.com/@yourusername" target="_blank" rel="noopener noreferrer" class="btn rounded-pill px-3" style="background-color: #e17122; color: #faf8e9;">
+                  <i class="fab fa-youtube me-2"></i>YouTube
+                </a> {% endcomment %}
+               {% comment %}  <a href="https://instagram.com/yourusername" target="_blank" rel="noopener noreferrer" class="btn rounded-pill px-3" style="background-color: #e17122; color: #faf8e9;">
+                  <i class="fab fa-instagram me-2"></i>Instagram
+                </a> {% endcomment %}
+                {% comment %} <a href="https://x.com/yourusername" target="_blank" rel="noopener noreferrer" class="btn rounded-pill px-3" style="background-color: #e17122; color: #faf8e9;">
+                  <i class="fab fa-x-twitter me-2"></i>X
+                </a> {% endcomment %}
+                <a href="https://gabrielsantosfullstack.netlify.app/" target="_blank" rel="noopener noreferrer" class="btn rounded-pill px-3" style="background-color: #e17122; color: #faf8e9;">
+                  <i class="fas fa-globe me-2"></i>Website
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  /* Section animation */
+  .animate-section {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-card {
+    animation: fadeIn 0.7s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Card styles */
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+  }
+
+  .card-text {
+    font-size: 0.95rem;
+  }
+
+  /* Button styles */
+  .btn {
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Circular image */
+  .rounded-circle {
+    transition: border-color 0.3s ease;
+  }
+
+  .rounded-circle:hover {
+    border-color: #e0a673;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    h1 {
+      font-size: 2rem;
+    }
+
+    .lead {
+      font-size: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    .card-text {
+      font-size: 0.85rem;
+    }
+
+    .btn {
+      width: 100%;
+      border-radius: 50px !important;
+    }
+
+    .d-flex {
+      flex-direction: column;
+      gap: 0.75rem !important;
+    }
+
+    .rounded-circle {
+      width: 100px;
+      height: 100px;
+    }
+  }
+</style>
+{% endblock %}

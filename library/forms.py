@@ -10,7 +10,7 @@ class BookForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'author': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 2, 'cols': 40, 'class': 'form-control'}),
-            'status': forms.Select(attrs={'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
         }
 
     def __init__(self, *args, user=None, **kwargs):
@@ -55,7 +55,7 @@ class BookLoanForm(forms.ModelForm):
             ('reserved', 'Reservado'),
         ],
         label='Status do Empréstimo',
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={'class': 'form-select'}),
     )
 
     class Meta:
@@ -63,7 +63,7 @@ class BookLoanForm(forms.ModelForm):
         fields = ['books', 'person', 'return_date']
         widgets = {
             'books': forms.SelectMultiple(attrs={'class': 'form-control'}),
-            'person': forms.Select(attrs={'class': 'form-control'}),
+            'person': forms.Select(attrs={'class': 'form-select'}),
             'return_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
         }
 

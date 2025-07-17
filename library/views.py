@@ -96,9 +96,9 @@ def view_loans(request):
             Q(books__title__icontains=query)   | Q(books__author__icontains=query) |
             Q(person__name__icontains=query),
             library=request.user.library
-        ).order_by('created_at')
+        ).order_by('loan_date')
     else:
-        loan = BookLoan.objects.filter(library=request.user.library).order_by('created_at')
+        loan = BookLoan.objects.filter(library=request.user.library).order_by('loan_date')
 
     paginator = Paginator(loan, 30) 
     page = request.GET.get('page')

@@ -3,68 +3,118 @@
 {% block title %}| {{ book.title }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
-      <div class="card shadow-sm border-0 {% if book.status == 'available' %}bg-success-light{% elif book.status == 'reserved' %}bg-warning-light{% elif book.status == 'unavailable' %}bg-danger-light{% else %}bg-orange-light{% endif %}">
-        <div class="card-body">
-          <h2 class="card-title mb-3">{{ book.title }}</h2>
-          <p class="card-text"><strong>Autor:</strong> {{ book.author }}</p>
-          <p class="card-text"><strong>Descrição:</strong> {{ book.description }}</p>
-          <p class="card-text"><strong>Status:</strong> 
-            <i class="fas fa-circle {% if book.status == 'available' %}text-success{% elif book.status == 'reserved' %}text-warning{% elif book.status == 'unavailable' %}text-danger{% else %}text-orange{% endif %}"></i>
+      <div class="card shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+        <div class="card-body p-4">
+          {% if book.book_image %}
+            <img src="{{ book.book_image.url|default:'/static/default_book.jpg' }}" alt="{{ book.title }}" class="card-img-top mb-3" style="max-height: 200px; object-fit: cover; border-radius: 8px;">
+          {% endif %}
+          <h2 class="card-title mb-3" style="color: #040404; font-weight: 600;">{{ book.title }}</h2>
+          <p class="card-text mb-2" style="color: #040404; font-weight: 500;"><strong>Autor:</strong> {{ book.author }}</p>
+          <p class="card-text mb-2" style="color: #040404;"><strong>Descrição:</strong> {{ book.description }}</p>
+          <p class="card-text mb-2" style="color: #040404;"><strong>Status:</strong> 
+            <i class="fas fa-circle me-1" style="{% if book.status == 'available' %}color: #28a745;{% elif book.status == 'reserved' %}color: #e0a673;{% elif book.status == 'unavailable' %}color: #dc3545;{% else %}color: #e17122;{% endif %}"></i>
             {{ book.get_status_display }}
           </p>
-          <p class="card-text"><strong>Data de Criação:</strong> {{ book.created_at|date:"d/m/Y H:i" }}</p>
-          <a href="{% url 'library:view_books' %}" class="btn btn-primary mt-3">Voltar para a Lista</a>
+          <p class="card-text mb-4" style="color: #040404; opacity: 0.7;"><strong>Data de Criação:</strong> {{ book.created_at|date:"d/m/Y H:i" }}</p>
+          <div class="d-flex gap-2">
+            <a href="{% url 'library:view_books' %}" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">Voltar para a Lista</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
 </div>
 
+<!-- JavaScript for Modal on Errors -->
+<script>
+  {% if form.errors %}
+    const editBookModal = new bootstrap.Modal(document.getElementById('editBookModal'));
+    editBookModal.show();
+  {% endif %}
+</script>
+
 <style>
-  /* Cores claras para o fundo do card */
-  .bg-success-light {
-    background-color: #e6f4ea !important; /* Verde claro */
-  }
-  .bg-warning-light {
-    background-color: #fff3cd !important; /* Amarelo claro */
-  }
-  .bg-danger-light {
-    background-color: #f8d7da !important; /* Vermelho claro */
-  }
-  .bg-orange-light {
-    background-color: #ffe5cc !important; /* Laranja claro */
+  /* Card styles */
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
-  /* Cor laranja personalizada para a bolinha */
-  .text-orange {
-    color: #fd7e14 !important; /* Laranja para checked_out */
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
   }
 
-  /* Estilização da bolinha */
-  .fa-circle {
+  .card-title {
+    font-size: 1.75rem;
+  }
+
+  .card-text {
     font-size: 1rem;
-    margin-right: 5px;
+    line-height: 1.6;
   }
 
-  /* Hover no botão */
-  .btn-primary:hover {
+  .fa-circle {
+    font-size: 0.8rem;
+  }
+
+  /* Button styles */
+  .btn {
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
     transform: translateY(-2px);
-    transition: transform 0.2s ease-in-out;
   }
 
-  /* Responsividade */
+  /* Modal styles */
+  .modal-content {
+    border-radius: 12px;
+  }
+
+  .form-control, .form-select {
+    background-color: #faf8e9;
+    border: 1px solid #e0a673;
+    border-radius: 8px;
+    color: #040404;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #e17122;
+    box-shadow: 0 0 0 3px rgba(225, 113, 34, 0.2);
+  }
+
+  /* Animation */
+  .animate-card {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive adjustments */
   @media (max-width: 576px) {
     .card-title {
       font-size: 1.5rem;
     }
+
     .card-text {
       font-size: 0.9rem;
     }
-    .btn-primary {
+
+    .btn {
       width: 100%;
+      border-radius: 50px !important;
+    }
+
+    .d-flex {
+      flex-direction: column;
+      gap: 0.75rem !important;
     }
   }
 </style>

@@ -1,9 +1,157 @@
 {% extends 'index.html' %}
 {% load static %}
 
+{% block title %} | Bem-vindo ao BookOwl{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h1>Welcome to the BookOwl</h1>
+<div class="container py-5">
+  <!-- Hero Section -->
+  <section class="text-center mb-5 animate-section">
+    <img src="{% static 'favicon.ico' %}" alt="BookOwl Logo" class="mb-3" style="width: 80px; height: 80px; object-fit: contain;">
+    <h1 class="mb-3" style="color: #040404; font-weight: 600;">Bem-vindo ao BookOwl</h1>
+    <p class="lead mb-4" style="color: #040404; opacity: 0.7; max-width: 600px; margin: 0 auto;">
+      Gerencie sua biblioteca com facilidade! O BookOwl é um sistema intuitivo para organizar livros, acompanhar empréstimos e conectar leitores.
+    </p>
+    {% if not user.is_authenticated %}
+        <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'signup' %}" class="btn rounded-pill px-4" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">
+            <i class="fas fa-user-plus me-2"></i>Registrar-se
+        </a>
+        <a href="{% url 'login' %}" class="btn rounded-pill px-4" style="background-color: #e0a673; color: #040404; transition: all 0.3s ease;">
+            <i class="fas fa-sign-in-alt me-2"></i>Fazer Login
+        </a>
+        </div>
+    {% endif %}
+  </section>
+
+  <!-- Features Section -->
+  <section class="mb-5">
+    <h2 class="text-center mb-4" style="color: #040404; font-weight: 600;">Por que escolher o BookOwl?</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <div class="col">
+        <div class="card h-100 shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px;">
+          <div class="card-body text-center">
+            <i class="fas fa-book fa-2x mb-3" style="color: #e17122;"></i>
+            <h5 class="card-title" style="color: #040404; font-weight: 500;">Gerenciamento de Livros</h5>
+            <p class="card-text" style="color: #040404; opacity: 0.7;">
+              Cadastre, edite e organize seus livros com facilidade, acompanhando títulos, autores e descrições.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100 shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px;">
+          <div class="card-body text-center">
+            <i class="fas fa-handshake fa-2x mb-3" style="color: #e17122;"></i>
+            <h5 class="card-title" style="color: #040404; font-weight: 500;">Controle de Empréstimos</h5>
+            <p class="card-text" style="color: #040404; opacity: 0.7;">
+              Acompanhe empréstimos, datas de devolução e status, mantendo tudo sob controle.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100 shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px;">
+          <div class="card-body text-center">
+            <i class="fas fa-user-friends fa-2x mb-3" style="color: #e17122;"></i>
+            <h5 class="card-title" style="color: #040404; font-weight: 500;">Gestão de Pessoas</h5>
+            <p class="card-text" style="color: #040404; opacity: 0.7;">
+              Gerencie os leitores da sua biblioteca, associando empréstimos e mantendo um histórico completo.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="text-center mb-5">
+    <h2 class="mb-4" style="color: #040404; font-weight: 600;">Sobre o BookOwl</h2>
+    <p class="mb-4" style="color: #040404; opacity: 0.7; max-width: 700px; margin: 0 auto;">
+      O BookOwl é um sistema de gerenciamento de bibliotecas projetado para simplificar a administração de livros e empréstimos. Seja você um bibliotecário, um gestor de acervo ou um entusiasta da leitura, nossa plataforma oferece uma interface amigável e funcionalidades robustas para atender às suas necessidades.
+    </p>
+    <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'about' %}" class="btn rounded-pill px-4" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">
+            Sobre Nós
+        </a> 
+        {% if not user.is_authenticated %}
+            <a href="{% url 'signup' %}" class="btn rounded-pill px-4" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">
+            Comece Agora
+            </a>
+        {% endif %}
+    </div>
+  </section>
+</div>
+
+<style>
+  /* Section animation */
+  .animate-section {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-card {
+    animation: fadeIn 0.7s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Card styles */
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+  }
+
+  .card-text {
+    font-size: 0.95rem;
+  }
+
+  /* Button styles */
+  .btn {
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    h1 {
+      font-size: 2rem;
+    }
+
+    .lead {
+      font-size: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    .card-text {
+      font-size: 0.85rem;
+    }
+
+    .btn {
+      width: 100%;
+      border-radius: 50px !important;
+    }
+
+    .d-flex {
+      flex-direction: column;
+      gap: 0.75rem !important;
+    }
+  }
+</style>
 {% endblock %}

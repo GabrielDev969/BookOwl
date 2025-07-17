@@ -1,27 +1,26 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'home' %}">
-            <img src="{% static 'favicon.ico' %}" alt="BookOwl Logo" class="navbar-logo me-2">BookOwl
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+            <img src="{% static 'favicon.ico' %}" alt="BookOwl Logo" class="navbar-logo me-2"> 
+            <span>BookOwl</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-center">
                 {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Dashboard</a>
-                    </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="libraryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="libraryDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
                             Biblioteca
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="libraryDropdown">
                             <li><a class="dropdown-item" href="{% url 'library:view_books' %}">Livros</a></li>
                             <li><a class="dropdown-item" href="{% url 'library:view_peoples' %}">Pessoas</a></li>
-                            <li><a class="dropdown-item" href="{% url 'library:view_loans' %}">Emprestimos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'library:view_loans' %}">Empréstimos</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -40,7 +39,7 @@
                         <a class="nav-link" href="{% url 'login' %}">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'signup' %}">Registrar</a>
+                        <a class="nav-link btn btn-accent ms-2" href="{% url 'signup' %}">Registrar</a>
                     </li>
                 {% endif %}
             </ul>
@@ -49,38 +48,141 @@
 </nav>
 
 <style>
+/* Navbar base styles */
+.navbar {
+    background-color: #040404; /* Primary black from palette */
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* Navbar brand */
+.navbar-brand {
+    color: #faf8e9 !important; /* Light beige from palette */
+    font-weight: 600;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.navbar-brand:hover {
+    color: #e0a673 !important; /* Hover with secondary orange */
+}
+
+/* Logo */
+.navbar-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover .navbar-logo {
+    transform: scale(1.1);
+}
+
+/* Nav links */
+.nav-link {
+    color: #faf8e9 !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #e17122 !important; /* Primary orange for hover */
+    background-color: rgba(225, 113, 34, 0.1); /* Subtle orange background */
+    border-radius: 4px;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+    background-color: #040404;
+    border: 1px solid rgba(224, 166, 115, 0.2); /* Subtle border with secondary orange */
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-item {
+    color: #faf8e9;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #e0a673; /* Secondary orange for hover */
+    color: #040404 !important;
+}
+
+/* Logout button */
 .btn-icon-logout {
     background-color: transparent;
     border: none;
-    color: #6c757d; /* Cor cinza (secondary do Bootstrap) */
-    transition: color 0.2s ease-in-out;
+    color: #faf8e9;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
 }
 
-/* Efeito de hover */
 .btn-icon-logout:hover {
-    color: #dc3545; /* Cor vermelha (danger do Bootstrap) */
+    color: #e17122;
+    background-color: rgba(225, 113, 34, 0.1);
+    border-radius: 4px;
 }
 
-/* Estilo para a imagem do logo */
-.navbar-logo {
-    width: 30px; /* Ajuste o tamanho conforme necessário */
-    height: 30px;
-    object-fit: contain; /* Mantém a proporção da imagem */
-    vertical-align: middle; /* Alinha verticalmente com o texto */
+/* Register button */
+.btn-accent {
+    background-color: #e17122; /* Primary orange */
+    color: #faf8e9 !important;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
-/* Ajuste para o dropdown em telas pequenas */
+.btn-accent:hover {
+    background-color: #e0a673; /* Secondary orange */
+    color: #040404 !important;
+    transform: translateY(-1px);
+}
+
+/* Toggler icon */
+.navbar-toggler {
+    border-color: rgba(225, 113, 34, 0.5);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23e17122' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Responsive adjustments */
 @media (max-width: 991px) {
+    .navbar-nav {
+        padding: 1rem;
+        background-color: #040404;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+    }
+
+    .nav-link {
+        padding: 0.75rem 1rem !important;
+    }
+
     .dropdown-menu {
-        background-color: #343a40; /* Mesma cor da navbar (bg-dark) */
+        background-color: #040404;
         border: none;
+        text-align: center;
     }
-    .dropdown-item {
-        color: #f8f9fa; /* Cor do texto da navbar (light) */
+
+    .btn-accent {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        margin-top: 0.5rem;
     }
-    .dropdown-item:hover {
-        background-color: #495057; /* Cor de fundo ao passar o mouse */
-        color: #ffffff;
-    }
+}
+
+/* Smooth transitions for collapse */
+.navbar-collapse {
+    transition: all 0.3s ease-in-out;
 }
 </style>

@@ -1,156 +1,96 @@
 {% extends 'index.html' %}
 {% load widget_tweaks %}
-{% block title %}| Profile{% endblock %}
+{% block title %}| Perfil{% endblock %}
 
 {% block content %}
-<style>
-    .profile-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .profile-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
-    }
-    .form-control:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-    .profile-img {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 50%;
-        border: 3px solid #fff;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    .legend-title {
-        font-size: 1.1rem;
-        color: #333;
-    }
-    .alert {
-        border-radius: 8px;
-    }
-    .btn-primary {
-        background: linear-gradient(45deg, #007bff, #00aaff);
-        border: none;
-        padding: 10px 20px;
-        font-weight: 600;
-    }
-    .btn-primary:hover {
-        background: linear-gradient(45deg, #0056b3, #007bff);
-    }
-    .char-counter {
-        font-size: 0.9rem;
-        color: #666;
-        margin-top: 5px;
-    }
-    .char-counter.warning {
-        color: #dc3545;
-    }
-    @media (max-width: 991px) {
-        .profile-info {
-            padding: 20px !important;
-            text-align: center;
-        }
-    }
-</style>
-
-<div class="container mt-4 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-xl-10 col-lg-11 col-md-12">
-            <div class="card o-hidden border-0 shadow-lg my-5 profile-card">
-                <div class="card-body p-0">
-                    <div class="row g-0">
-                        <div class="col-lg-5 profile-info d-flex flex-column align-items-center justify-content-center text-center bg-light border-end p-4">
-                            {% if user.profile.avatar %}
-                                <img src="{{ user.profile.avatar.url }}" alt="Profile Picture" class="profile-img mb-3">
-                            {% else %}
-                                <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
-                            {% endif %}
-                            <h2 class="h4 font-weight-bold text-dark mb-2">{{ user.username }}</h2>
-                            <p class="text-muted mb-2">{{ user.email }}</p>
-                            <small class="text-muted">Membro desde {{ user.date_joined|date:"d/m/Y" }}</small>
-                        </div>
-
-                        <div class="col-lg-7 p-4 p-md-5">
-                            <div class="text-center text-lg-start mb-4">
-                                <h1 class="h4 text-gray-900 fw-bold">Configurações do Perfil</h1>
-                            </div>
-
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                        {{ message }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                            
-                            <form method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <fieldset>
-                                    <legend class="border-bottom mb-4 pb-2 legend-title">Informações da Conta</legend>
-                                    <div class="row">
-                                        {% for field in user_form %}
-                                            <div class="col-md-6 mb-3">
-                                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                                {{ field|add_class:"form-control" }}
-                                                {% if field.errors %}
-                                                    <div class="text-danger small">{{ field.errors }}</div>
-                                                {% endif %}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                    
-                                    <legend class="border-bottom mt-4 mb-4 pb-2 legend-title">Dados Pessoais</legend>
-                                    <div class="row">
-                                        {% for field in profile_form %}
-                                            <div class="col-md-6 mb-3">
-                                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                               
-                                                {{ field|add_class:"form-control" }}
-                                          
-                                                {% if field.errors %}
-                                                    <div class="text-danger small">{{ field.errors }}</div>
-                                                {% endif %}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </fieldset>
-                                
-                                <div class="form-group mt-4 text-end">
-                                    <button class="btn btn-primary" type="submit">
-                                        <i class="fas fa-save me-2"></i>Salvar Alterações
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-xl-10 col-lg-11 col-md-12">
+      <div class="card border-0 shadow-lg my-5 animate-card" style="background-color: #faf8e9; border-radius: 12px;">
+        <div class="card-body p-0">
+          <div class="row g-0">
+            <div class="col-lg-5 profile-info d-flex flex-column align-items-center justify-content-center text-center p-4" style="background-color: #faf8e9; border-right: 1px solid #e0a673;">
+              {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="Profile Picture" class="profile-img mb-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid #e17122; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+              {% else %}
+                <i class="fas fa-user-circle fa-4x mb-3" style="color: #e0a673;"></i>
+              {% endif %}
+              <h2 class="h4 font-weight-bold mb-2" style="color: #040404;">{{ user.username }}</h2>
+              <p class="mb-2" style="color: #040404; opacity: 0.7;">{{ user.email }}</p>
+              <small style="color: #040404; opacity: 0.7;">Membro desde {{ user.date_joined|date:"d/m/Y" }}</small>
             </div>
+
+            <div class="col-lg-7 p-4 p-md-5">
+              <div class="text-center text-lg-start mb-4">
+                <h1 class="h4 fw-bold" style="color: #040404;">Configurações do Perfil</h1>
+              </div>
+              
+              <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <fieldset>
+                  <legend class="border-bottom mb-4 pb-2 legend-title" style="font-size: 1.1rem; color: #040404; border-color: #e0a673;">Informações da Conta</legend>
+                  <div class="row">
+                    {% for field in user_form %}
+                      <div class="col-md-6 mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label" style="color: #040404;">{{ field.label }}</label>
+                        {{ field|add_class:"form-control" }}
+                        {% if field.errors %}
+                          <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                  
+                  <legend class="border-bottom mt-4 mb-4 pb-2 legend-title" style="font-size: 1.1rem; color: #040404; border-color: #e0a673;">Dados Pessoais</legend>
+                  <div class="row">
+                    {% for field in profile_form %}
+                      <div class="col-md-6 mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label" style="color: #040404;">{{ field.label }}</label>
+                        {{ field|add_class:"form-control" }}
+                        {% if field.id_for_label == 'id_bio' %}
+                          <div id="bio-counter" class="char-counter">0/500 caracteres</div>
+                        {% endif %}
+                        {% if field.errors %}
+                          <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                </fieldset>
+                
+                <div class="form-group mt-4 text-end">
+                  <button class="btn rounded-pill" type="submit" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">
+                    <i class="fas fa-save me-2"></i>Salvar Alterações
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/4b9ba14b0f.js" crossorigin="anonymous"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const bioField = document.getElementById('bio');
-        const counter = document.getElementById('bio-counter');
-        const maxLength = 500;
+  document.addEventListener('DOMContentLoaded', function() {
+    const bioField = document.getElementById('id_bio');
+    const counter = document.getElementById('bio-counter');
+    const maxLength = 500;
 
-        function updateCounter() {
-            const currentLength = bioField.value.length;
-            counter.textContent = `${currentLength}/${maxLength} caracteres`;
-            if (currentLength >= maxLength) {
-                counter.classList.add('warning');
-            } else {
-                counter.classList.remove('warning');
-            }
-        }
+    function updateCounter() {
+      if (bioField && counter) {
+        const currentLength = bioField.value.length;
+        counter.textContent = `${currentLength}/${maxLength} caracteres`;
+        counter.classList.toggle('warning', currentLength >= maxLength);
+      }
+    }
 
-        bioField.addEventListener('input', updateCounter);
-        updateCounter(); // Inicializa o contador com o valor atual
-    });
+    if (bioField) {
+      bioField.addEventListener('input', updateCounter);
+      updateCounter(); // Initialize counter
+    }
+  });
 </script>
-{% endblock content %}
+{% endblock %}

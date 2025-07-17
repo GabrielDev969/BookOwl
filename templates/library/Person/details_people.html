@@ -2,43 +2,118 @@
 {% block title %}| {{ person.name }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
+<div class="container py-5">
+  <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
-        <div class="card shadow-sm border-0 bg-light">
-        <div class="card-body">
-            <h2 class="card-title mb-3">{{ person.name }}</h2>
-            <p class="card-text"><strong>E-mail:</strong> {{ person.email }}</p>
-            {% if person.phone %}
-            <p class="card-text"><strong>Telefone:</strong> {{ person.phone }}</p>
-            {% endif %}
-            <p class="card-text"><strong>Endereço:</strong> {{ person.address }}</p>
-            <p class="card-text"><strong>Criado em:</strong> {{ person.created_at|date:"d/m/Y H:i" }}</p>
-            <a href="{% url 'library:view_peoples' %}" class="btn btn-primary mt-3">Voltar para a Lista</a>
+      <div class="card shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+        <div class="card-body p-4">
+          {% if person.avatar %}
+            <img src="{{ person.avatar.url|default:'/static/default_avatar.jpg' }}" alt="{{ person.name }}" class="rounded-circle mb-3 align-self-center" style="width: 100px; height: 100px; object-fit: cover;">
+          {% endif %}
+          <h2 class="card-title mb-3" style="color: #040404; font-weight: 600;">{{ person.name }}</h2>
+          <p class="card-text mb-2" style="color: #040404; font-weight: 500;"><strong>E-mail:</strong> {{ person.email }}</p>
+          {% if person.phone %}
+            <p class="card-text mb-2" style="color: #040404;"><strong>Telefone:</strong> {{ person.phone }}</p>
+          {% endif %}
+          <p class="card-text mb-2" style="color: #040404;"><strong>Endereço:</strong> {{ person.address }}</p>
+          <p class="card-text mb-4" style="color: #040404; opacity: 0.7;"><strong>Criado em:</strong> {{ person.created_at|date:"d/m/Y H:i" }}</p>
+          <div class="d-flex gap-2">
+            <a href="{% url 'library:view_peoples' %}" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">Voltar para a Lista</a>
+          </div>
         </div>
-        </div>
+      </div>
     </div>
-    </div>
+  </div>
 </div>
 
+<!-- JavaScript for Modal on Errors -->
+<script>
+  {% if form.errors %}
+    const editPersonModal = new bootstrap.Modal(document.getElementById('editPersonModal'));
+    editPersonModal.show();
+  {% endif %}
+</script>
+
 <style>
-    /* Hover no botão */
-    .btn-primary:hover {
+  /* Card styles */
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .card-title {
+    font-size: 1.75rem;
+  }
+
+  .card-text {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Button styles */
+  .btn {
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
     transform: translateY(-2px);
-    transition: transform 0.2s ease-in-out;
+  }
+
+  /* Modal styles */
+  .modal-content {
+    border-radius: 12px;
+  }
+
+  .form-control, .form-select {
+    background-color: #faf8e9;
+    border: 1px solid #e0a673;
+    border-radius: 8px;
+    color: #040404;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #e17122;
+    box-shadow: 0 0 0 3px rgba(225, 113, 34, 0.2);
+  }
+
+  /* Animation */
+  .animate-card {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    .card-title {
+      font-size: 1.5rem;
     }
 
-    /* Responsividade */
-    @media (max-width: 576px) {
-    .card-title {
-        font-size: 1.5rem;
-    }
     .card-text {
-        font-size: 0.9rem;
+      font-size: 0.9rem;
     }
-    .btn-primary {
-        width: 100%;
+
+    .btn {
+      width: 100%;
+      border-radius: 50px !important;
     }
+
+    .d-flex {
+      flex-direction: column;
+      gap: 0.75rem !important;
     }
+
+    .rounded-circle {
+      width: 80px;
+      height: 80px;
+    }
+  }
 </style>
 {% endblock %}

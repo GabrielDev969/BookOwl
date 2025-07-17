@@ -3,35 +3,122 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>BookOwl {% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta name="description" content="BookOwl - Sistema de Gerenciamento de Biblioteca">
+    <title>BookOwl {% block title %}{% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-    <!-- Bootstrap Icons CDN (opcional) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome CDN -->
+    <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
-        /* Estilizar o container de toasts */
+        /* Global styles */
+        body {
+            background: linear-gradient(180deg, #faf8e9 0%, #f5f3e0 100%); /* Subtle gradient with palette colors */
+            color: #040404;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main content container */
+        main {
+            flex: 1;
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Toast container */
         .toast-container {
             position: fixed;
-            top: 2rem; /* 10px abaixo do topo */
-            left: 50%; /* Centraliza horizontalmente */
-            transform: translateX(-50%); /* Ajusta para o centro */
-            z-index: 1055; /* Acima da navbar e outros elementos */
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1055;
+            width: 90%;
+            max-width: 400px;
         }
+
         .toast {
-            min-width: 300px;
+            background-color: #040404 !important; /* Dark background */
+            color: #faf8e9 !important; /* Light text */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-in-out;
+            border: 1px solid #e17122; /* Orange accent */
+        }
+
+        .toast-body {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .btn-close-white {
+            filter: invert(1); /* White close button */
+        }
+
+        .toast.bg-success {
+            background-color: #28a745 !important; /* Bootstrap success for consistency */
+            border-color: #28a745;
+        }
+
+        .toast.bg-danger {
+            background-color: #dc3545 !important; /* Bootstrap danger */
+            border-color: #dc3545;
+        }
+
+        .toast.bg-warning {
+            background-color: #e0a673 !important; /* Palette secondary orange */
+            border-color: #e0a673;
+        }
+
+        .toast.bg-info {
+            background-color: #e17122 !important; /* Palette primary orange */
+            border-color: #e17122;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Content block animation */
+        .content-block {
+            animation: fadeInContent 0.5s ease-in-out;
+        }
+
+        @keyframes fadeInContent {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .toast {
+                min-width: 100%;
+            }
+
+            main {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-
+    <!-- Toast notifications -->
     <div class="toast-container">
         {% if messages %}
             {% for message in messages %}
-                <div class="toast align-items-center text-white {% if message.tags == 'success' %}bg-success{% elif message.tags == 'error' %}bg-danger{% elif message.tags == 'warning' %}bg-warning{% else %}bg-info{% endif %} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+                <div class="toast align-items-center text-white {% if message.tags == 'success' %}bg-success{% elif message.tags == 'error' %}bg-danger{% elif message.tags == 'warning' %}bg-warning{% else %}bg-info{% endif %}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
                     <div class="d-flex">
                         <div class="toast-body">
                             {{ message }}
@@ -43,28 +130,28 @@
         {% endif %}
     </div>
 
+    <!-- Navbar -->
     {% include 'Components/navbar.html' %}
-    
-    {% block content %}
-    {% endblock %}    
 
-    <!-- Bootstrap JS Bundle (inclui Popper) -->
+    <!-- Main content -->
+    <main class="content-block">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- jQuery (opcional, se necessário) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <!-- Toast initialization -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var toasts = document.querySelectorAll('.toast');
-            toasts.forEach(function (toast) {
-                var bsToast = new bootstrap.Toast(toast);
+            const toasts = document.querySelectorAll('.toast');
+            toasts.forEach(toast => {
+                const bsToast = new bootstrap.Toast(toast);
                 bsToast.show();
             });
         });
     </script>
-
-    <!-- Scripts adicionais -->
+    <!-- Custom scripts -->
     {% block scripts %}
     {% endblock %}
 </body>

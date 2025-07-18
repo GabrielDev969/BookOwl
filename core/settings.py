@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- CONFIGURAÇÕES DE SEGURANÇA ---
 # A SECRET_KEY é lida da variável de ambiente. NUNCA a deixe no código.
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY_DJANGO')
 
 # O modo DEBUG é desativado por padrão em produção.
 # Ele só será 'True' se a variável de ambiente DEBUG for explicitamente 'True'.

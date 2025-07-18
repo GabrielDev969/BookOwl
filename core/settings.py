@@ -40,7 +40,7 @@ if RAILWAY_APP_HOSTNAME:
 # Força o redirecionamento para HTTPS em produção.
 # A variável IS_HEROKU é um nome comum que o Railway também pode usar.
 # Ou podemos simplesmente checar se DEBUG é False.
-SECURE_SSL_REDIRECT = not DEBUG
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 

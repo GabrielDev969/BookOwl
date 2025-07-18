@@ -4,19 +4,29 @@ from django.db import models
 from django.utils import timezone
 
 class BookForm(forms.ModelForm):
+    status = forms.ChoiceField(
+        choices=[
+            (Book.StatusBook.AVAILABLE, 'Disponível'),
+            (Book.StatusBook.UNAVAILABLE, 'Indisponível')
+        ],
+        label='Status',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
     class Meta:
         model = Book
         fields = ['title', 'author', 'description', 'status']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'author': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'rows': 2, 'cols': 40, 'class': 'form-control'}),
-            'status': forms.Select(attrs={'class': 'form-select'}),
+            'description': forms.Textarea(attrs={'rows': 2, 'cols': 40, 'class': 'form-control'})
         }
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+
+        if self.instance and self.instance.pk and self.instance.status in [Book.StatusBook.CHECKED_OUT, Book.StatusBook.RESERVED]:
+            self.fields['status'].widget.attrs['disabled'] = True
 
     def save(self, commit=True):
         book = super().save(commit=False)
@@ -134,6 +144,7 @@ class BookLoanForm(forms.ModelForm):
         loan = super().save(commit=False)
         if self.user and hasattr(self.user, 'library') and self.user.library:
             loan.library = self.user.library
+        
         loan.status_book = self.cleaned_data['status_book']
 
         if self.cleaned_data['status_book'] == 'reserved':

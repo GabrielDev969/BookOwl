@@ -40,7 +40,18 @@ def view_books(request):
 @login_required
 def details_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
-    return render(request, 'library/Book/details_book.html', context={'book': book})
+
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Livro editado com sucesso!')
+            return redirect('library:details_book', book_id=book_id)
+        else:
+            messages.error(request, 'Error ao tentar editar o livro. Verifique os dados e tente novamente.')
+    else:
+        form = BookForm(instance=book, user=request.user)
+    return render(request, 'library/Book/details_book.html', context={'book': book, 'form': form})
 
 @login_required
 def view_peoples(request):

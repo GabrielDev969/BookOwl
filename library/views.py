@@ -92,7 +92,19 @@ def view_peoples(request):
 @login_required
 def details_people(request, person_id):
     person = get_object_or_404(Person, id=person_id)
-    return render(request, 'library/Person/details_people.html', context={'person': person})
+
+    if request.method == 'POST':
+        form = PersonForm(request.POST, instance=person, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Pessoa editada com sucesso!')
+            return redirect('library:details_people', person_id=person_id)
+        else:
+            messages.error(request, 'Error ao tentar editar a pessoa. Verifique os dados e tente novamente.')
+    else:
+        form = PersonForm(instance=person, user=request.user)
+
+    return render(request, 'library/Person/details_people.html', context={'person': person, 'form': form})
 
 @login_required
 def view_loans(request):

@@ -25,10 +25,88 @@
           <p class="card-text mb-4" style="color: #040404; opacity: 0.7;"><strong>Criado em:</strong> {{ person.created_at|date:"d/m/Y H:i" }}</p>
         </div>
       </div>
+      <div class="card shadow-sm border-0 mt-4 animate-card" style="background-color: #faf8e9; border-radius: 12px;">
+        <div class="card-body d-flex justify-content-center gap-3 py-3">              
+          <button type="button" class="btn rounded-circle" title="Editar Livro" style="background-color: #e17122; color: #faf8e9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" data-bs-toggle="modal" data-bs-target="#editPersonModal">
+            <i class="fas fa-edit"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- Edit Person Modal -->
+<div class="modal fade" id="editPersonModal" tabindex="-1" aria-labelledby="editPersonModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color: #faf8e9; border: 1px solid #e0a673; border-radius: 12px;">
+      <div class="modal-header" style="border-bottom: 1px solid #e0a673;">
+        <h5 class="modal-title" id="editPersonModalLabel" style="color: #040404; font-weight: 600;">Editar Pessoa</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'library:details_people' person.id %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="{{ form.name.id_for_label }}" class="form-label" style="color: #040404;">Nome</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+              <div class="text-danger small mt-1">
+                {% for error in form.name.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.email.id_for_label }}" class="form-label" style="color: #040404;">E-mail</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <div class="text-danger small mt-1">
+                {% for error in form.email.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.phone.id_for_label }}" class="form-label" style="color: #040404;">Telefone (opcional)</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+              <div class="text-danger small mt-1">
+                {% for error in form.phone.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.address.id_for_label }}" class="form-label" style="color: #040404;">Endereço</label>
+            {{ form.address }}
+            {% if form.address.errors %}
+              <div class="text-danger small mt-1">
+                {% for error in form.address.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          {% if form.non_field_errors %}
+            <div class="text-danger small mb-3">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #040404; color: #faf8e9;">Cancelar</button>
+            <button type="submit" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9;">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- JavaScript for Modal on Errors -->
 <script>
   {% if form.errors %}

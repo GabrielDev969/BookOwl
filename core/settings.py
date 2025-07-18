@@ -17,7 +17,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY_DJANGO')
 
 # O modo DEBUG é desativado por padrão em produção.
 # Ele só será 'True' se a variável de ambiente DEBUG for explicitamente 'True'.
-DEBUG = os.environ.get('DEBUG') == 'True'
+DEBUG = False
 
 # --- CONFIGURAÇÕES DE REDE (HOSTS) ---
 # Configuração dinâmica de ALLOWED_HOSTS para Railway.

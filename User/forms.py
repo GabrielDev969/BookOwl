@@ -13,6 +13,16 @@ class SignUpForm(UserCreationForm):
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name','library_name', 'password1', 'password2')
 
+    def __init__(self ,*args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].widget.attrs['disabled'] = True
+        self.fields['first_name'].widget.attrs['disabled'] = True
+        self.fields['last_name'].widget.attrs['disabled'] = True
+        self.fields['library_name'].widget.attrs['disabled'] = True
+        self.fields['username'].widget.attrs['disabled'] = True
+        self.fields['password1'].widget.attrs['disabled'] = True
+        self.fields['password2'].widget.attrs['disabled'] = True
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']

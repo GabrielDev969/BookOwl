@@ -28,6 +28,13 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'User/signup.html', {'form': form})
 
+def signup_close(request):
+    messages.info(request, 'Não estamos recebendo cadastros no momentos.')
+    if request.method == 'POST':
+        return redirect('login')
+    else:
+        form = SignUpForm()
+    return render(request, 'User/signup.html', {'form': form})
 
 @login_required
 def profile_view(request):

@@ -4,7 +4,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
-from .forms import UserUpdateForm, ProfileUpdateForm
+from .forms import UserUpdateForm, ProfileUpdateForm, SignUpCloseForm
 
 class CustomLoginView(LoginView):
     template_name = 'User/login.html'
@@ -33,7 +33,7 @@ def signup_close(request):
     if request.method == 'POST':
         return redirect('login')
     else:
-        form = SignUpForm()
+        form = SignUpCloseForm()
     return render(request, 'User/signup.html', {'form': form})
 
 @login_required

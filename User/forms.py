@@ -3,11 +3,11 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, Profile
 from library.models import Library
 
-class SignUpForm(UserCreationForm):
-    email = forms.EmailField(max_length=255, required=True, help_text='Please provide a valid email.')
-    first_name = forms.CharField(max_length=30, required=True, help_text='Enter your first name.')
-    last_name = forms.CharField(max_length=30, required=True, help_text='Enter your last name.')
-    library_name = forms.CharField(max_length=100, required=True, help_text='Enter the name of the library.')
+class SignUpCloseForm(UserCreationForm):
+    email = forms.EmailField(max_length=255, required=True, help_text='Por favor, forneça um e-mail válido.')
+    first_name = forms.CharField(max_length=30, required=True, help_text='Digite seu primeiro nome.')
+    last_name = forms.CharField(max_length=30, required=True, help_text='Digite seu sobrenome.')
+    library_name = forms.CharField(max_length=100, required=True, help_text='Digite o nome da biblioteca.')
 
     class Meta:
         model = CustomUser
@@ -22,6 +22,17 @@ class SignUpForm(UserCreationForm):
         self.fields['username'].widget.attrs['disabled'] = True
         self.fields['password1'].widget.attrs['disabled'] = True
         self.fields['password2'].widget.attrs['disabled'] = True
+
+
+class SignUpForm(UserCreationForm):
+    email = forms.EmailField(max_length=255, required=True, help_text='Por favor, forneça um e-mail válido.')
+    first_name = forms.CharField(max_length=30, required=True, help_text='Digite seu primeiro nome.')
+    last_name = forms.CharField(max_length=30, required=True, help_text='Digite seu sobrenome.')
+    library_name = forms.CharField(max_length=100, required=True, help_text='Digite o nome da biblioteca.')
+
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email', 'first_name', 'last_name','library_name', 'password1', 'password2')
 
     def save(self, commit=True):
         user = super().save(commit=False)

@@ -1,16 +1,19 @@
 {% extends 'index.html' %}
-{% block title %}| Empréstimo{% endblock %}
+{% load static %}
+
+{% block title %} | Empréstimo X000{{ loan.cd_bookloan }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
-      <div class="card shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+      <div class="card shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px; transition: transform 0.3s ease, box-shadow 0.3s ease; position: relative;">
+        <!-- Back Arrow -->
+        <a href="{% url 'library:view_loans' %}" class="position-absolute top-0 start-0 m-3" style="color: #e17122; font-size: 1.5rem; transition: color 0.3s ease;" title="Voltar para a Lista" aria-label="Voltar para a lista de empréstimos">
+          <i class="fas fa-arrow-left"></i>
+        </a>
         <div class="card-body p-4">
-          <h2 class="card-title mb-3" style="color: #040404; font-weight: 600;">Empréstimo</h2>
-          <p class="card-text mb-2" style="color: #040404; font-weight: 500;">
-            <strong>Código de Empréstimo:</strong> X000{{ loan.cd_bookloan }}
-          </p>
+          <h2 class="card-title mb-3 text-center" style="color: #040404; font-weight: 600;">Empréstimo X000{{ loan.cd_bookloan }}</h2>
           <p class="card-text mb-2" style="color: #040404; font-weight: 500;">
             <strong>Livro(s):</strong>
             {% for book in loan.books.all %}
@@ -22,22 +25,22 @@
             <div class="row g-2 mb-3">
               {% for book in loan.books.all|slice:":2" %}
                 <div class="col-6">
-                  <img src="{{ book.book_image.url|default:'/static/default_book.jpg' }}" alt="{{ book.title }}" class="img-fluid" style="max-height: 100px; object-fit: cover; border-radius: 8px;">
+                  <img src="{{ book.book_image.url|default:'/static/images/default_book.jpg' }}" alt="{{ book.title }}" class="img-fluid" style="max-height: 100px; object-fit: cover; border-radius: 8px;">
                 </div>
               {% endfor %}
             </div>
           {% endif %}
           <p class="card-text mb-2" style="color: #040404;"><strong>Pessoa:</strong> {{ loan.person.name }}</p>
           <p class="card-text mb-2" style="color: #040404;">
-            <strong>Data de Empréstimo:
+            <strong>Data de Empréstimo:</strong>
             {% if loan.loan_date %}
-              </strong> {{ loan.loan_date|date:"d/m/Y H:i" }}
+              {{ loan.loan_date|date:"d/m/Y H:i" }}
             {% else %}
               Aguardando Entrega do Material
-            {% endif %} 
+            {% endif %}
           </p>
           <p class="card-text mb-2" style="color: #040404; opacity: 0.7;">
-            <strong>Data Prevista de Devolução:</strong> 
+            <strong>Data Prevista de Devolução:</strong>
             {% if loan.date_previous_return %}
               {{ loan.date_previous_return|date:"d/m/Y H:i" }}
             {% else %}
@@ -45,7 +48,7 @@
             {% endif %}
           </p>
           <p class="card-text mb-2" style="color: #040404; opacity: 0.7;">
-            <strong>Data de Devolução:</strong> 
+            <strong>Data de Devolução:</strong>
             {% if loan.return_date %}
               {{ loan.return_date|date:"d/m/Y H:i" }}
             {% else %}
@@ -53,47 +56,38 @@
             {% endif %}
           </p>
           <p class="card-text mb-4" style="color: #040404;">
-            <strong>Status do Empréstimo:</strong> 
+            <strong>Status do Empréstimo:</strong>
             <i class="fas fa-circle me-1" style="{% if loan.status == 'returned' %}color: #28a745;{% elif loan.status == 'overdue' %}color: #e0a673;{% elif loan.status == 'cancelled' %}color: #dc3545;{% else %}color: #e17122;{% endif %}"></i>
             <small style="color: #040404; opacity: 0.7;">{{ loan.get_status_display }}</small>
           </p>
-          <div class="d-flex gap-2">
-            <a href="{% url 'library:view_loans' %}" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">Voltar para a Lista</a>
-          </div>
         </div>
       </div>
       {% if loan.status == 'active' or loan.status == 'awaiting_pickup' or loan.status == 'overdue' %}
         <div class="card shadow-sm border-0 mt-4 animate-card" style="background-color: #faf8e9; border-radius: 12px;">
           <div class="card-body d-flex justify-content-center gap-3 py-3">
-            <!-- Confirmar Devolução -->
             {% if loan.status == 'active' or loan.status == 'overdue' %}
               <form action="{% url 'library:returned_loan' loan.id %}" method="post" class="d-inline">
                 {% csrf_token %}
-                <button type="submit" class="btn rounded-circle" title="Confirmar Devolução" style="background-color: #28a745; color: #faf8e9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-check"></i>
+                <button type="submit" class="btn rounded-circle" title="Confirmar Devolução" style="background-color: #28a745; color: #faf8e9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                  <i class="fas fa-check"></i>
                 </button>
               </form>
-              <!-- Cancelar Empréstimo -->
               <form action="{% url 'library:cancel_loan' loan.id %}" method="post" class="d-inline">
                 {% csrf_token %}
-                <button type="submit" class="btn rounded-circle" title="Confirmar Devolução" style="background-color: #dc3545; color: #faf8e9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times"></i>
+                <button type="submit" class="btn rounded-circle" title="Cancelar Empréstimo" style="background-color: #dc3545; color: #faf8e9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                  <i class="fas fa-times"></i>
                 </button>
               </form>
             {% endif %}
-            <!-- Confirmar Retirada -->
             {% if loan.status == 'awaiting_pickup' %}
               <form action="{% url 'library:pickup_loan' loan.id %}" method="post" class="d-inline">
                 {% csrf_token %}
-                <button type="submit" class="btn rounded-circle" title="Confirmar Retirada" style="background-color: #ffc107; color: #faf8e9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                <button type="submit" class="btn rounded-circle" title="Confirmar Retirada" style="background-color: #e0a673; color: #040404; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
                   <i class="fas fa-hand-holding"></i>
                 </button>
               </form>
             {% endif %}
-            <!-- Editar Empréstimo -->
-            <button type="button" class="btn rounded-circle" title="Editar Empréstimo"
-              style="background-color: #e17122; color: #faf8e9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;"
-              data-bs-toggle="modal" data-bs-target="#editLoanModal">
+            <button type="button" class="btn rounded-circle" title="Editar Empréstimo" style="background-color: #e17122; color: #faf8e9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" data-bs-toggle="modal" data-bs-target="#editLoanModal">
               <i class="fas fa-edit"></i>
             </button>
           </div>
@@ -106,8 +100,8 @@
 <!-- Edit Loan Modal -->
 <div class="modal fade" id="editLoanModal" tabindex="-1" aria-labelledby="editLoanModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="background-color: #faf8e9; border-radius: 12px;">
-      <div class="modal-header">
+    <div class="modal-content" style="background-color: #faf8e9; border: 1px solid #e0a673; border-radius: 12px;">
+      <div class="modal-header" style="border-bottom: 1px solid #e0a673;">
         <h5 class="modal-title" id="editLoanModalLabel" style="color: #040404; font-weight: 600;">Editar Empréstimo</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -115,43 +109,65 @@
         <form action="{% url 'library:details_loan' loan.id %}" method="post">
           {% csrf_token %}
           <div class="mb-3">
-            <label class="form-label" style="color: #040404;">Livro(s)</label>
+            <label for="{{ form.books.id_for_label }}" class="form-label" style="color: #040404;">Livro(s)</label>
             {{ form.books }}
             {% if form.books.errors %}
-              <div class="text-danger">{{ form.books.errors }}</div>
+              <div class="text-danger small mt-1">
+                {% for error in form.books.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
             {% endif %}
           </div>
           <div class="mb-3">
-            <label class="form-label" style="color: #040404;">Pessoa</label>
+            <label for="{{ form.person.id_for_label }}" class="form-label" style="color: #040404;">Pessoa</label>
             {{ form.person }}
             {% if form.person.errors %}
-              <div class="text-danger">{{ form.person.errors }}</div>
+              <div class="text-danger small mt-1">
+                {% for error in form.person.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
             {% endif %}
           </div>
           <div class="mb-3">
-            <label class="form-label" style="color: #040404;">Data Prevista de Devolução</label>
+            <label for="{{ form.date_previous_return.id_for_label }}" class="form-label" style="color: #040404;">Data Prevista de Devolução</label>
             {{ form.date_previous_return }}
             {% if form.date_previous_return.errors %}
-              <div class="text-danger">{{ form.date_previous_return.errors }}</div>
+              <div class="text-danger small mt-1">
+                {% for error in form.date_previous_return.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
             {% endif %}
           </div>
           <div class="mb-3">
-            <label class="form-label" style="color: #040404;">Status do Empréstimo</label>
-            {{ form.status_book }}
-            {% if form.status_book.errors %}
-              <div class="text-danger">{{ form.status_book.errors }}</div>
+            <label for="{{ form.status.id_for_label }}" class="form-label" style="color: #040404;">Status do Empréstimo</label>
+            {{ form.status }}
+            {% if form.status.errors %}
+              <div class="text-danger small mt-1">
+                {% for error in form.status.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
             {% endif %}
           </div>
+          {% if form.non_field_errors %}
+            <div class="text-danger small mb-3">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
           <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #dc3545; color: #faf8e9;">Cancelar</button>
-            <button type="submit" class="btn rounded-pill" style="background-color: #28a745; color: #faf8e9;">Salvar</button>
+            <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #040404; color: #faf8e9;">Cancelar</button>
+            <button type="submit" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9;">Salvar</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 </div>
-
 
 <!-- JavaScript for Modal on Errors -->
 <script>
@@ -183,6 +199,11 @@
 
   .fa-circle {
     font-size: 0.8rem;
+  }
+
+  /* Back arrow */
+  .fa-arrow-left:hover {
+    color: #e0a673;
   }
 
   /* Button styles */
@@ -243,6 +264,10 @@
 
     .img-fluid {
       max-height: 80px;
+    }
+
+    .fa-arrow-left {
+      font-size: 1.2rem;
     }
   }
 </style>

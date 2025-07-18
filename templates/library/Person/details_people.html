@@ -1,25 +1,28 @@
 {% extends 'index.html' %}
-{% block title %}| {{ person.name }}{% endblock %}
+{% load static %}
+
+{% block title %} | {{ person.name }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
-      <div class="card shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+      <div class="card shadow-sm border-0 animate-card" style="background-color: #faf8e9; border-radius: 12px; transition: transform 0.3s ease, box-shadow 0.3s ease; position: relative;">
+        <!-- Back Arrow -->
+        <a href="{% url 'library:view_peoples' %}" class="position-absolute top-0 start-0 m-3" style="color: #e17122; font-size: 1.5rem; transition: color 0.3s ease;" title="Voltar para a Lista" aria-label="Voltar para a lista de pessoas">
+          <i class="fas fa-arrow-left"></i>
+        </a>
         <div class="card-body p-4">
           {% if person.avatar %}
-            <img src="{{ person.avatar.url|default:'/static/default_avatar.jpg' }}" alt="{{ person.name }}" class="rounded-circle mb-3 align-self-center" style="width: 100px; height: 100px; object-fit: cover;">
+            <img src="{{ person.avatar.url|default:'/static/images/default_avatar.jpg' }}" alt="{{ person.name }}" class="rounded-circle mb-3 align-self-center" style="width: 100px; height: 100px; object-fit: cover; border: 2px solid #e0a673;">
           {% endif %}
-          <h2 class="card-title mb-3" style="color: #040404; font-weight: 600;">{{ person.name }}</h2>
+          <h2 class="card-title mb-3 text-center" style="color: #040404; font-weight: 600;">{{ person.name }}</h2>
           <p class="card-text mb-2" style="color: #040404; font-weight: 500;"><strong>E-mail:</strong> {{ person.email }}</p>
           {% if person.phone %}
             <p class="card-text mb-2" style="color: #040404;"><strong>Telefone:</strong> {{ person.phone }}</p>
           {% endif %}
           <p class="card-text mb-2" style="color: #040404;"><strong>Endereço:</strong> {{ person.address }}</p>
           <p class="card-text mb-4" style="color: #040404; opacity: 0.7;"><strong>Criado em:</strong> {{ person.created_at|date:"d/m/Y H:i" }}</p>
-          <div class="d-flex gap-2">
-            <a href="{% url 'library:view_peoples' %}" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9; transition: all 0.3s ease;">Voltar para a Lista</a>
-          </div>
         </div>
       </div>
     </div>
@@ -52,6 +55,11 @@
   .card-text {
     font-size: 1rem;
     line-height: 1.6;
+  }
+
+  /* Back arrow */
+  .fa-arrow-left:hover {
+    color: #e0a673;
   }
 
   /* Button styles */
@@ -113,6 +121,10 @@
     .rounded-circle {
       width: 80px;
       height: 80px;
+    }
+
+    .fa-arrow-left {
+      font-size: 1.2rem;
     }
   }
 </style>

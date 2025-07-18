@@ -1,7 +1,8 @@
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+import dj_database_url
 
+from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,11 +13,26 @@ SECRET_KEY = os.environ.get('SECRET_KEY_DJANGO')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['bookowl.up.railway.app']
+# --- CONFIGURAÇÕES DE REDE (HOSTS) ---
+# Configuração dinâmica de ALLOWED_HOSTS para Railway.
+ALLOWED_HOSTS = []
+RAILWAY_APP_HOSTNAME = os.environ.get('RAILWAY_APP_HOSTNAME')
+if RAILWAY_APP_HOSTNAME:
+    # Adiciona o domínio do Railway quando a variável estiver disponível
+    ALLOWED_HOSTS.append(RAILWAY_APP_HOSTNAME)
 
-CSRF_TRUSTED_ORIGINS = ['https://bookowl.up.railway.app']
+# Se estiver em desenvolvimento, permita o host local.
+if DEBUG:
+    ALLOWED_HOSTS.append('127.0.0.1')
+    ALLOWED_HOSTS.append('localhost')
 
-SECURE_SSL_REDIRECT = True
+CSRF_TRUSTED_ORIGINS = []
+if RAILWAY_APP_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RAILWAY_APP_HOSTNAME}" )
+
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 # Application definition
 
@@ -26,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'widget_tweaks',
 
@@ -37,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -70,30 +88,26 @@ LOGOUT_REDIRECT_URL = 'login'
 LOGIN_URL='/auth/login'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-""" DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# --- BANCO DE DADOS ---
+# Configuração unificada que funciona tanto localmente quanto em produção.
+# O Railway provê a variável DATABASE_URL automaticamente.
+# Para o Supabase, você pode construir essa URL ou usar a que eles fornecem.
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=True # Força SSL para bancos de dados remotos
+        )
     }
-} """
-
-#SUPABASE(Production)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+else:
+    # Fallback para um banco de dados local (SQLite) se DATABASE_URL não estiver definida.
+    # Isso facilita o desenvolvimento local sem precisar de um banco de dados externo.
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -126,16 +140,17 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# --- ARQUIVOS ESTÁTICOS (CSS, JavaScript, Images) ---
+# Configuração para WhiteNoise servir os arquivos estáticos em produção.
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles' # Onde o `collectstatic` irá copiar os arquivos para produção.
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'static', # Onde o Django procura seus arquivos estáticos durante o desenvolvimento.
 ]
-STATICFILES_ROOT = BASE_DIR / 'staticfiles'
+
+# Adiciona o motor de armazenamento do WhiteNoise.
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

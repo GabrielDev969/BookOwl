@@ -17,11 +17,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY_DJANGO')
 
 # O modo DEBUG é desativado por padrão em produção.
 # Ele só será 'True' se a variável de ambiente DEBUG for explicitamente 'True'.
-DEBUG = False
+DEBUG = os.environ.get('DEBUG') == 'True'
 
 # --- CONFIGURAÇÕES DE REDE (HOSTS) ---
 # Configuração dinâmica de ALLOWED_HOSTS para Railway.
-ALLOWED_HOSTS = ['bookowl.up.railway.app']
+ALLOWED_HOSTS = []
 RAILWAY_APP_HOSTNAME = os.environ.get('RAILWAY_APP_HOSTNAME')
 if RAILWAY_APP_HOSTNAME:
     # Adiciona o domínio do Railway quando a variável estiver disponível
@@ -40,8 +40,9 @@ if RAILWAY_APP_HOSTNAME:
 # Força o redirecionamento para HTTPS em produção.
 # A variável IS_HEROKU é um nome comum que o Railway também pode usar.
 # Ou podemos simplesmente checar se DEBUG é False.
-SECURE_SSL_REDIRECT = True
-
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 # Application definition
 INSTALLED_APPS = [

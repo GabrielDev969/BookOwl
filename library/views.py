@@ -159,6 +159,21 @@ def returned_loan(request, loan_id):
     return redirect('library:details_loan', loan_id=loan_id) 
 
 @login_required
+def pickup_loan(request, loan_id):
+    loan = get_object_or_404(BookLoan, id=loan_id)
+
+    if request.method == 'POST':
+        loan.status = BookLoan.StatusLoan.ACTIVE
+        loan.books.update(status=Book.StatusBook.CHECKED_OUT)
+        loan.loan_date = timezone.now()
+        loan.save()
+        messages.success(request, 'Reserva alterada para Empréstimo com sucesso!')
+        return redirect('library:view_loans')
+    else:
+        messages.error(request, 'Error ao tentar retirar reserva do emprestimo. Tente novamente.')
+    return redirect('library:details_loan', loan_id=loan_id)
+
+@login_required
 def cancel_loan(request, loan_id):
     loan = get_object_or_404(BookLoan, id=loan_id)
 

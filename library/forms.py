@@ -83,9 +83,11 @@ class BookLoanForm(forms.ModelForm):
             )
             self.fields['person'].widget.attrs['disabled'] = True
             self.fields['books'].widget.attrs['disabled'] = True
+            self.fields['status_book'].widget.attrs['disabled'] = True
             # Tornar books e person opcionais na edição
             self.fields['books'].required = False
             self.fields['person'].required = False
+            self.fields['status_book'].required = False
             # Garantir que status_book reflita o status do primeiro livro
             if self.instance.books.exists():
                 first_book = self.instance.books.first()
@@ -106,7 +108,9 @@ class BookLoanForm(forms.ModelForm):
                     if book.library != self.user.library:
                         raise forms.ValidationError(f"O livro '{book.title}' não pertence à sua biblioteca.")
                     if BookLoan.objects.filter(
-                        books=book, return_date__isnull=True
+                        books=book, 
+                        return_date__isnull=True,
+                        status__in=['active', 'overdue', 'awaiting_pickup']
                     ).exclude(pk=self.instance.pk).exists():
                         raise forms.ValidationError(f"O livro '{book.title}' já está emprestado ou reservado e não foi devolvido.")
             # Na edição, usar a pessoa existente se person não for fornecido
@@ -131,6 +135,13 @@ class BookLoanForm(forms.ModelForm):
         if self.user and hasattr(self.user, 'library') and self.user.library:
             loan.library = self.user.library
         loan.status_book = self.cleaned_data['status_book']
+
+        if self.cleaned_data['status_book'] == 'reserved':
+            loan.status = 'awaiting_pickup'
+        else: 
+            loan.loan_date = timezone.now()
+            loan.status = 'active'
+
         if commit:
             loan.save()
             # Na criação, definir os livros; na edição, manter os existentes

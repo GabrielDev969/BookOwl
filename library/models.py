@@ -45,7 +45,7 @@ class BookLoan(models.Model):
         ACTIVE = 'active', 'Ativo'
         OVERDUE = 'overdue', 'Atrasado'
         RETURNED = 'returned', 'Devolvido'
-        RESERVED = 'reserved', 'Reservado'
+        AWAITING_PICKUP = 'awaiting_pickup', 'Aguardando Retirada'
         CANCELLED = 'cancelled', 'Cancelado'
 
     cd_bookloan = models.PositiveIntegerField(
@@ -56,7 +56,7 @@ class BookLoan(models.Model):
     library = models.ForeignKey(Library, on_delete=models.CASCADE)
     books = models.ManyToManyField(Book, related_name='loans')
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    loan_date = models.DateTimeField(auto_now_add=True)
+    loan_date = models.DateTimeField(blank=True, null=True)
     return_date = models.DateTimeField(blank=True, null=True)
     date_previous_return = models.DateTimeField(blank=True, null=True)
     status = models.CharField(

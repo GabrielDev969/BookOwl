@@ -39,7 +39,14 @@
                 X000{{ loan.cd_bookloan}}
               </h5>
               <p class="card-text mb-2" style="color: #040404; opacity: 0.7;"><strong>Pessoa:</strong> {{ loan.person.name }}</p>
-              <p class="card-text mb-2" style="color: #040404;"><strong>Data de Empréstimo:</strong> {{ loan.loan_date|date:"d/m/Y H:i" }}</p>
+              <p class="card-text mb-2" style="color: #040404; opacity: 0.7;">
+                <strong>Data de Empréstimo:</strong> 
+                {% if loan.loan_date %}
+                  {{ loan.loan_date|date:"d/m/Y H:i" }}
+                {% else %}
+                  Não definida
+                {% endif %}
+              </p>
               <p class="card-text mb-2" style="color: #040404; opacity: 0.7;">
                 <strong>Data Prevista de Devolução:</strong> 
                 {% if loan.date_previous_return %}

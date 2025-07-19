@@ -8,7 +8,7 @@
 
 Bem-vindo ao **BookOwl**, um sistema intuitivo para gerenciar bibliotecas de igrejas, empresas ou coleções pessoais! Criado com ❤️ para organizar livros e empréstimos de forma simples e eficiente, o BookOwl nasceu de uma necessidade real: ajudar uma irmã da nossa igreja a gerenciar a biblioteca local.
 
-> ⚠️ **Aviso Importante**: O recurso de registro (signup) está temporariamente desativado. Para acessar o sistema, entre em contato com o administrador em [gabrieldev969@example.com](mailto:gabriel.dev969@example.com) para obter uma conta.
+> ⚠️ **Aviso Importante**: O recurso de registro (signup) está temporariamente desativado. Para acessar o sistema, entre em contato com o administrador em [gabriel.dev969@gmail.com](mailto:gabriel.dev969@gmail.com) para obter uma conta.
 
 ## 📚 Objetivo
 
@@ -99,7 +99,7 @@ Desenvolvido por **GabrielDev969**, um desenvolvedor apaixonado por criar soluç
 - [LinkedIn](https://www.linkedin.com/in/gabriel-santos-b53632196)
 - [Website](https://gabrielsantosfullstack.netlify.app)
 
-Para dúvidas, sugestões ou suporte, envie um e-mail para [gabrieldev969@example.com](mailto:gabriel.dev969@gmail.com).
+Para dúvidas, sugestões ou suporte, envie um e-mail para [gabriel.dev969@gmail.com](mailto:gabriel.dev969@gmail.com).
 
 ---
 

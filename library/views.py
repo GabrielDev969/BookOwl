@@ -11,7 +11,11 @@ from django.utils import timezone
 def view_books(request):
     query = request.GET.get('search', '')
     if query:
-        books = Book.objects.filter(title__icontains=query, library=request.user.library).order_by('title')  | Book.objects.filter(author__icontains=query, library=request.user.library).order_by('title')
+        books = Book.objects.filter(
+            title__icontains=query, library=request.user.library
+        ).union(
+            Book.objects.filter(author__icontains=query, library=request.user.library)
+        ).order_by('title') 
     else:
         books = Book.objects.filter(library=request.user.library).order_by('title')
 
@@ -29,13 +33,20 @@ def view_books(request):
         form = BookForm(request.POST, user=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, "Livro criado com sucesso!")
+            messages.success(request, 'Livro criado com sucesso!')
             return redirect('library:view_books')
         else:
-            messages.error("Erro ao criar livro. Verifique os dados e tente novamente.")
+            messages.error(request,"Erro ao criar livro. Verifique os dados e tente novamente.")
     else:
         form = BookForm(user=request.user)
-    return render(request, 'library/Book/view_books.html', context={'books': book_paginated, 'query': query, 'form': form})
+
+    context={
+        'books': book_paginated, 
+        'query': query, 
+        'form': form
+    }
+
+    return render(request, 'library/Book/view_books.html', context)
 
 @login_required
 def details_book(request, book_id):
@@ -51,7 +62,12 @@ def details_book(request, book_id):
             messages.error(request, 'Error ao tentar editar o livro. Verifique os dados e tente novamente.')
     else:
         form = BookForm(instance=book, user=request.user)
-    return render(request, 'library/Book/details_book.html', context={'book': book, 'form': form})
+
+    context={
+        'book': book, 
+        'form': form
+    }
+    return render(request, 'library/Book/details_book.html', context)
 
 @login_required
 def view_peoples(request):
@@ -86,8 +102,12 @@ def view_peoples(request):
     else:
         form = PersonForm(user=request.user)
 
-    
-    return render(request, 'library/Person/view_people.html', context={'peoples': people_paginated, 'form': form})
+    context={
+        'peoples': people_paginated, 
+        'query': query,
+        'form': form
+    }
+    return render(request, 'library/Person/view_people.html', context)
 
 @login_required
 def details_people(request, person_id):
@@ -104,7 +124,12 @@ def details_people(request, person_id):
     else:
         form = PersonForm(instance=person, user=request.user)
 
-    return render(request, 'library/Person/details_people.html', context={'person': person, 'form': form})
+    context={
+        'person': person, 
+        'form': form
+    }
+
+    return render(request, 'library/Person/details_people.html', context)
 
 @login_required
 def view_loans(request):
@@ -145,7 +170,13 @@ def view_loans(request):
     else:
         form = BookLoanForm(user=request.user)
 
-    return render(request, 'library/BookLoan/view_loans.html', context={'loans': loan_paginated, 'form': form})
+    context={
+        'loans': loan_paginated,
+        'query': query, 
+        'form': form
+    }
+
+    return render(request, 'library/BookLoan/view_loans.html', context)
 
 @login_required
 def details_loan(request, loan_id):
@@ -162,7 +193,12 @@ def details_loan(request, loan_id):
     else:
         form = BookLoanForm(instance=loan, user=request.user)
 
-    return render(request, 'library/BookLoan/details_loan.html', context={'loan': loan, 'form': form})
+    context={
+        'loan': loan, 
+        'form': form
+    }
+
+    return render(request, 'library/BookLoan/details_loan.html', context)
 
 @login_required
 def returned_loan(request, loan_id):

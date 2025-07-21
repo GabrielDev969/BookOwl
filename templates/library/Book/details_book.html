@@ -114,10 +114,12 @@
 
 <!-- JavaScript for Modal on Errors -->
 <script>
-  {% if form.errors %}
-    const editBookModal = new bootstrap.Modal(document.getElementById('editBookModal'));
-    editBookModal.show();
-  {% endif %}
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if form.errors %}
+      const editBookModal = new bootstrap.Modal(document.getElementById('editBookModal'));
+      editBookModal.show();
+    {% endif %}
+  })
 </script>
 
 <style>

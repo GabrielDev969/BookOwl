@@ -71,7 +71,7 @@ class BookLoanForm(forms.ModelForm):
 
     class Meta:
         model = BookLoan
-        fields = ['books', 'person', 'date_previous_return']
+        fields = ['books', 'person', 'date_previous_return', 'status_book']
         widgets = {
             'books': forms.SelectMultiple(attrs={'class': 'form-control'}),
             'person': forms.Select(attrs={'class': 'form-select'}),

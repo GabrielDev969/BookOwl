@@ -4,7 +4,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
-from .forms import UserUpdateForm, ProfileUpdateForm, SignUpCloseForm
+from .forms import UserUpdateForm, ProfileUpdateForm, SignUpCloseForm, CustomPasswordChangeForm
 
 class CustomLoginView(LoginView):
     template_name = 'User/login.html'
@@ -54,10 +54,36 @@ def profile_view(request):
         # Se for um GET, apenas instancia os formulários com os dados atuais do usuário
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
+        form = CustomPasswordChangeForm(user=request.user)
 
     context = {
         'user_form': user_form,
-        'profile_form': profile_form
+        'profile_form': profile_form,
+        'password_form': form
     }
 
+    return render(request, 'User/profile.html', context)
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(user=request.user, data=request.POST)
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Sua senha foi alterada com sucesso!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Erro ao alterar a senha. Verifique os dados e tente novamente.')
+    else:
+        form = CustomPasswordChangeForm(user=request.user)
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
+
+    context = {
+        'password_form': form,
+        'user_form': user_form,
+        'profile_form': profile_form,
+    }
     return render(request, 'User/profile.html', context)

@@ -18,6 +18,9 @@
               <h2 class="h4 font-weight-bold mb-2" style="color: #040404;">{{ user.username }}</h2>
               <p class="mb-2" style="color: #040404; opacity: 0.7;">{{ user.email }}</p>
               <small style="color: #040404; opacity: 0.7;">Membro desde {{ user.date_joined|date:"d/m/Y" }}</small>
+              <button type="button" class="btn rounded-pill mt-3" style="background-color: #e17122; color: #faf8e9;" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                <i class="fas fa-lock me-2"></i>Alterar Senha
+              </button>
             </div>
 
             <div class="col-lg-7 p-4 p-md-5">
@@ -25,7 +28,7 @@
                 <h1 class="h4 fw-bold" style="color: #040404;">Configurações do Perfil</h1>
               </div>
               
-              <form method="POST" enctype="multipart/form-data">
+              <form method="POST" enctype="multipart/form-data" action="{% url 'profile' %}">
                 {% csrf_token %}
                 <fieldset>
                   <legend class="border-bottom mb-4 pb-2 legend-title" style="font-size: 1.1rem; color: #040404; border-color: #e0a673;">Informações da Conta</legend>
@@ -72,6 +75,36 @@
   </div>
 </div>
 
+<!-- Modal de Alteração de Senha -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color: #faf8e9; border-radius: 12px;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changePasswordModalLabel" style="color: #040404; font-weight: 600;">Alterar Senha</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'change_password' %}">
+          {% csrf_token %}
+          {% for field in password_form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label" style="color: #040404;">{{ field.label }}</label>
+              {{ field|add_class:"form-control" }}
+              {% if field.errors %}
+                <div class="text-danger small">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #dc3545; color: #faf8e9;">Cancelar</button>
+            <button type="submit" class="btn rounded-pill" style="background-color: #28a745; color: #faf8e9;">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://kit.fontawesome.com/4b9ba14b0f.js" crossorigin="anonymous"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -89,8 +122,47 @@
 
     if (bioField) {
       bioField.addEventListener('input', updateCounter);
-      updateCounter(); // Initialize counter
+      updateCounter();
     }
+
+    {% if password_form.errors %}
+      const changePasswordModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+      changePasswordModal.show();
+    {% endif %}
   });
 </script>
+
+<style>
+  .card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important; }
+  .profile-img { transition: transform 0.3s ease; }
+  .profile-img:hover { transform: scale(1.05); }
+  .form-control, .form-select {
+    background-color: #faf8e9;
+    border: 1px solid #e0a673;
+    border-radius: 8px;
+    color: #040404;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #e17122;
+    box-shadow: 0 0 0 3px rgba(225, 113, 34, 0.2);
+  }
+  .form-control:disabled, .form-select:disabled {
+    background-color: #e9ecef;
+    opacity: 0.7;
+  }
+  .legend-title { font-weight: 600; }
+  .char-counter { font-size: 0.8rem; color: #040404; opacity: 0.7; }
+  .char-counter.warning { color: #dc3545; }
+  .animate-card { animation: fadeIn 0.5s ease-in-out; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @media (max-width: 576px) {
+    .profile-info { border-right: none !important; border-bottom: 1px solid #e0a673; }
+    .btn { width: 100%; border-radius: 50px !important; }
+    .d-flex { flex-direction: column; gap: 0.75rem !important; }
+  }
+</style>
 {% endblock %}

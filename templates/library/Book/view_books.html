@@ -1,14 +1,15 @@
 {% extends 'index.html' %}
+{% load static %}
 {% block title %}| Livros{% endblock %}
 
 {% block content %}
 <div class="container py-5">
   <h1 class="mb-4 text-center" style="color: #040404; font-weight: 600;">Lista de Livros</h1>
   
-  <!-- Search and Add Button -->
+  <!-- Search and Action Button -->
   <div class="row mb-5 justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
-      <form method="get" class="d-flex align-items-center gap-2">
+      <form method="get" class="d-flex align-items-center gap-2" id="searchForm">
         <div class="input-group shadow-sm" style="border-radius: 50px; overflow: hidden;">
           <span class="input-group-text bg-white border-0">
             <i class="fas fa-search" style="color: #e17122;"></i>
@@ -18,7 +19,7 @@
         <button type="submit" class="btn rounded-pill px-4" style="background-color: #e17122; color: #faf8e9;">
           <i class="fas fa-search"></i>
         </button>
-        <button type="button" class="btn rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createBookModal" style="background-color: #e0a673; color: #faf8e9;">
+        <button type="button" class="btn rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#actionModal" style="background-color: #e0a673; color: #faf8e9;">
           <i class="fas fa-plus"></i>
         </button>
       </form>
@@ -38,7 +39,7 @@
               <p class="card-text" style="color: #040404;">{{ book.description|truncatewords:20 }}</p>
             </div>
             <div class="text-end mt-2">
-              <i class="fas fa-circle me-1" style="{% if book.status == 'available' %}color: #28a745;{% elif book.status == 'reserved' %}color: #e0a673;{% elif book.status == 'unavailable' %}color: #dc3545;{% else %}color: #e17122;{% endif %}"></i>
+              <i class="fas fa-circle me-1" style="{% if book.status == 'available' %}color: #28a745;{% else %}color: #dc3545;{% endif %}"></i>
               <small style="color: #040404; opacity: 0.7;">{{ book.get_status_display }}</small>
             </div>
           </div>
@@ -98,6 +99,34 @@
     </ul>
   </nav>
   {% endif %}
+
+  <!-- Modal for Action Selection -->
+  <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: #faf8e9; border: 1px solid #e17122;">
+        <div class="modal-header" style="border-bottom: 1px solid #e0a673;">
+          <h5 class="modal-title" id="actionModalLabel" style="color: #040404; font-weight: 600;">Escolha uma Ação</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex flex-column gap-2">
+            <button type="button" class="btn rounded-pill" data-bs-toggle="modal" data-bs-target="#createBookModal" data-bs-dismiss="modal" style="background-color: #e17122; color: #faf8e9;">
+              Criar Novo Livro
+            </button>
+            <button type="button" class="btn rounded-pill" data-bs-toggle="modal" data-bs-target="#uploadFileModal" data-bs-dismiss="modal" style="background-color: #e17122; color: #faf8e9;">
+              Importar Arquivo
+            </button>
+            <p class="text-center mt-3" style="color: #040404; font-size: 0.9rem;">
+              Baixe o exemplo de importação em 
+              <a href="{% static 'examples/example_import_csv.csv' %}" class="example-link" download>.csv</a> 
+              ou 
+              <a href="{% static 'examples/example_import_xlsx.xlsx' %}" class="example-link" download>.xlsx</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal for Creating Books -->
   <div class="modal fade" id="createBookModal" tabindex="-1" aria-labelledby="createBookModalLabel" aria-hidden="true">
@@ -170,16 +199,115 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal for Uploading File -->
+  <div class="modal fade" id="uploadFileModal" tabindex="-1" aria-labelledby="uploadFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: #faf8e9; border: 1px solid #e17122;">
+        <div class="modal-header" style="border-bottom: 1px solid #e0a673;">
+          <h5 class="modal-title" id="uploadFileModalLabel" style="color: #040404; font-weight: 600;">Importar Arquivo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="importForm" method="post" enctype="multipart/form-data" action="{% url 'library:view_books' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="fileInput" class="form-label" style="color: #040404;">Selecione um arquivo (.csv ou .xlsx)</label>
+              <input type="file" id="fileInput" name="file" accept=".csv,.xlsx" class="form-control rounded-pill" style="background-color: #faf8e9; color: #040404; border: 1px solid #e0a673;" required>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e0a673;">
+              <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #040404; color: #faf8e9;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Reviewing Imported Books -->
+  <div class="modal fade" id="reviewBooksModal" tabindex="-1" aria-labelledby="reviewBooksModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content" style="background-color: #faf8e9; border: 1px solid #e17122;">
+        <div class="modal-header" style="border-bottom: 1px solid #e0a673;">
+          <h5 class="modal-title" id="reviewBooksModalLabel" style="color: #040404; font-weight: 600;">Revisar Livros Importados</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% if data_for_review %}
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Linha</th>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Descrição</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in data_for_review %}
+              <tr>
+                <td>{{ item.row }}</td>
+                <td class="{% if item.errors.title %}error-cell{% endif %}">{{ item.data.title }}{% if item.errors.title %} <span class="error">({{ item.errors.title }})</span>{% endif %}</td>
+                <td class="{% if item.errors.author %}error-cell{% endif %}">{{ item.data.author }}{% if item.errors.author %} <span class="error">({{ item.errors.author }})</span>{% endif %}</td>
+                <td class="{% if item.errors.description %}error-cell{% endif %}">{{ item.data.description }}{% if item.errors.description %} <span class="error">({{ item.errors.description }})</span>{% endif %}</td>
+                <td class="{% if item.errors.status %}error-cell{% endif %}">{{ item.data.status }}{% if item.errors.status %} <span class="error">({{ item.errors.status }})</span>{% endif %}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="text-center" style="color: #040404;">Nenhum dado para revisão.</p>
+          {% endif %}
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid #e0a673;">
+          <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #040404; color: #faf8e9;">Cancelar</button>
+          <form method="post" action="{% url 'library:confirm_import' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9;" {% if has_errors %}disabled{% endif %}>Confirmar Importação</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- JavaScript for Modal on Errors -->
+<!-- JavaScript for Button and Modals -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    const createBookModal = new bootstrap.Modal(document.getElementById('createBookModal'));
+    const uploadFileModal = new bootstrap.Modal(document.getElementById('uploadFileModal'));
+    const reviewBooksModal = new bootstrap.Modal(document.getElementById('reviewBooksModal'));
+    const importForm = document.getElementById('importForm');
+    const fileInput = document.getElementById('fileInput');
+
+    // Aciona o diálogo de seleção de arquivo quando a modal de upload é exibida
+    document.getElementById('uploadFileModal').addEventListener('shown.bs.modal', function() {
+      fileInput.click();
+    });
+
+    // Envia o formulário automaticamente ao selecionar um arquivo
+    fileInput.addEventListener('change', function() {
+      if (this.files.length > 0) {
+        importForm.submit();
+      }
+    });
+
+    // Fecha a modal de upload se o usuário cancelar a seleção de arquivo
+    fileInput.addEventListener('cancel', function() {
+      uploadFileModal.hide();
+    });
+
+    // Abre a modal de revisão se houver dados
+    {% if data_for_review %}
+      reviewBooksModal.show();
+    {% endif %}
+
+    // Abre a modal de criação em caso de erros no formulário
     {% if form.errors %}
-      const createBookModal = new bootstrap.Modal(document.getElementById('createBookModal'));
       createBookModal.show();
     {% endif %}
-  })
+  });
 </script>
 
 <style>
@@ -206,12 +334,12 @@
     font-size: 0.8rem;
   }
 
-  /* Search bar and buttons */
-  .input-group {
+  /* Search bar, button, and inputs */
+  .input-group, .form-control {
     transition: box-shadow 0.3s ease;
   }
 
-  .input-group:focus-within {
+  .input-group:focus-within, .form-control:focus {
     box-shadow: 0 0 0 3px rgba(225, 113, 34, 0.2) !important;
   }
 
@@ -253,16 +381,37 @@
     border-radius: 12px;
   }
 
-  .form-control, .form-select {
+  .form-control {
     background-color: #faf8e9;
     border: 1px solid #e0a673;
     border-radius: 8px;
     color: #040404;
   }
 
-  .form-control:focus, .form-select:focus {
+  .form-control:focus {
     border-color: #e17122;
     box-shadow: 0 0 0 3px rgba(225, 113, 34, 0.2);
+  }
+
+  /* Review Table */
+  .table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #e0a673;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .error {
+    color: red;
+    font-weight: bold;
+  }
+
+  .error-cell {
+    background-color: #ffe6e6;
   }
 
   /* Responsive adjustments */
@@ -281,7 +430,7 @@
       align-items: stretch !important;
     }
 
-    .btn {
+    .btn, .form-control {
       width: 100%;
       border-radius: 50px !important;
     }
@@ -298,6 +447,10 @@
     .page-link {
       font-size: 0.85rem;
       padding: 0.4rem 0.8rem;
+    }
+
+    .modal-dialog-xl {
+      max-width: 95%;
     }
   }
 </style>

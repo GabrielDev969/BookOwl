@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Book, Person, BookLoan
 from django.db.models import Q
@@ -6,22 +7,31 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import BookForm, PersonForm, BookLoanForm
 from django.utils import timezone
+from django.core.files.storage import default_storage
+from django.urls import reverse
+import json
+from django.http import JsonResponse
+from .utils.import_books import validate_books, save_books 
+import os
 
 @login_required
 def view_books(request):
+    """
+    View para listar livros, buscar, criar novos livros e importar arquivos.
+    """
+    # Busca e paginação
     query = request.GET.get('search', '')
     if query:
         books = Book.objects.filter(
             title__icontains=query, library=request.user.library
         ).union(
             Book.objects.filter(author__icontains=query, library=request.user.library)
-        ).order_by('title') 
+        ).order_by('title')
     else:
         books = Book.objects.filter(library=request.user.library).order_by('title')
 
-    paginator = Paginator(books, 30) 
+    paginator = Paginator(books, 30)
     page = request.GET.get('page')
-
     try:
         book_paginated = paginator.page(page)
     except PageNotAnInteger:
@@ -29,24 +39,121 @@ def view_books(request):
     except EmptyPage:
         book_paginated = paginator.page(paginator.num_pages)
 
-    if request.method == 'POST':
-        form = BookForm(request.POST, user=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Livro criado com sucesso!')
-            return redirect('library:view_books')
-        else:
-            messages.error(request,"Erro ao criar livro. Verifique os dados e tente novamente.")
-    else:
-        form = BookForm(user=request.user)
-
-    context={
-        'books': book_paginated, 
-        'query': query, 
-        'form': form
+    # Inicializa o formulário de criação de livro
+    form = BookForm(user=request.user)
+    context = {
+        'books': book_paginated,
+        'query': query,
+        'form': form,
+        'data_for_review': [],
+        'has_errors': False
     }
 
+    if request.method == 'POST':
+        # Verifica se é criação de livro
+        if 'title' in request.POST:
+            form = BookForm(request.POST, user=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Livro criado com sucesso!')
+                return redirect('library:view_books')
+            else:
+                messages.error(request, "Erro ao criar livro. Verifique os dados e tente novamente.")
+                context['form'] = form
+
+        # Verifica se é upload de arquivo
+        elif 'file' in request.FILES:
+            file = request.FILES['file']
+            temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
+            
+            # Cria o diretório temp/ se não existir
+            try:
+                os.makedirs(temp_dir, exist_ok=True)
+            except Exception as e:
+                messages.error(request, f"Erro ao criar diretório temporário: {str(e)}")
+                return redirect('library:view_books')
+
+            # Salva o arquivo no diretório temp/
+            file_path = default_storage.save(f'temp/{file.name}', file)
+            full_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+            file_type = 'xlsx' if file.name.endswith('.xlsx') else 'csv'
+
+            # Valida o arquivo
+            try:
+                result = validate_books(full_file_path, file_type, user=request.user)
+            except Exception as e:
+                messages.error(request, f"Erro ao processar o arquivo: {str(e)}")
+                default_storage.delete(file_path)
+                return redirect('library:view_books')
+
+            # Remove o arquivo temporário
+            default_storage.delete(file_path)
+
+            if result['status'] == 'error':
+                messages.error(request, 'Erro ao processar o arquivo: ' + ', '.join(result['errors']))
+                return redirect('library:view_books')
+
+            # Armazena os dados validados na sessão para confirmação
+            request.session['books_for_review'] = json.dumps({
+                'valid_books': [
+                    {
+                        'library_id': book.library_id,
+                        'title': book.title,
+                        'author': book.author,
+                        'description': book.description,
+                        'status': book.status
+                    } for book in result['valid_books']
+                ],
+                'data_for_review': result['data_for_review'],
+                'errors': result['errors']
+            })
+
+            # Adiciona dados de revisão ao contexto para exibir a modal
+            context['data_for_review'] = result['data_for_review']
+            context['has_errors'] = len(result['errors']) > 0
+
     return render(request, 'library/Book/view_books.html', context)
+
+@login_required
+def confirm_import(request):
+    """
+    View para confirmar a importação dos livros.
+    """
+    if request.method != 'POST':
+        messages.error(request, 'Método inválido.')
+        return redirect('library:view_books')
+
+    books_data = request.session.get('books_for_review')
+    if not books_data:
+        messages.error(request, 'Nenhum dado para importar.')
+        return redirect('library:view_books')
+
+    books_data = json.loads(books_data)
+    if books_data['errors']:
+        messages.error(request, 'Não é possível importar com erros nos dados.')
+        return redirect('library:view_books')
+
+    # Reconstroi os objetos Book
+    valid_books = [
+        Book(
+            library_id=book['library_id'],
+            title=book['title'],
+            author=book['author'],
+            description=book['description'],
+            status=book['status']
+        ) for book in books_data['valid_books']
+    ]
+
+    # Salva os livros
+    result = save_books(valid_books, batch_size=1000)
+
+    if result['status'] == 'success':
+        messages.success(request, f'{result["total_imported"]} livros importados com sucesso!')
+        del request.session['books_for_review']
+    else:
+        messages.error(request, 'Erro ao importar livros: ' + ', '.join(result['errors']))
+
+    return redirect('library:view_books')
 
 @login_required
 def details_book(request, book_id):
@@ -246,4 +353,3 @@ def cancel_loan(request, loan_id):
         messages.error(request, "Erro ao cancelar o empréstimo. Tente novamente.")
     
     return redirect('library:details_loan', loan_id=loan_id)
-    

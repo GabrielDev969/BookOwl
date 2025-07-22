@@ -3,7 +3,7 @@
 ![BookOwl Logo](https://github.com/user-attachments/assets/743d47c6-1f72-4002-9d1a-87f02fba6b67#width=150&height=150)
 
 [![Status](https://img.shields.io/badge/STATUS-EM%20PRODUCAO-green?style=for-the-badge)](https://github.com/GabrielDev969/BookOwl)
-[![Version](https://img.shields.io/badge/Versão-1.0.0-green?style=for-the-badge)](https://github.com/GabrielDev969/BookOwl)
+[![Version](https://img.shields.io/badge/Versão-1.1.1-green?style=for-the-badge)](https://github.com/GabrielDev969/BookOwl)
 [![License](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)](LICENSE)
 
 Bem-vindo ao **BookOwl**, um sistema intuitivo para gerenciar bibliotecas de igrejas, empresas ou coleções pessoais! Criado com ❤️ para organizar livros e empréstimos de forma simples e eficiente, o BookOwl nasceu de uma necessidade real: ajudar uma irmã da nossa igreja a gerenciar a biblioteca local.
@@ -97,7 +97,7 @@ Desenvolvido por **GabrielDev969**, um desenvolvedor apaixonado por criar soluç
 
 - [GitHub](https://github.com/GabrielDev969)
 - [LinkedIn](https://www.linkedin.com/in/gabriel-santos-b53632196)
-- [Website](https://gabrielsantosfullstack.netlify.app)
+- [Website](https://gabrieldev969.github.io/Portfolio/)
 
 Para dúvidas, sugestões ou suporte, envie um e-mail para [gabrieldev969@example.com](mailto:gabriel.dev969@gmail.com).
 

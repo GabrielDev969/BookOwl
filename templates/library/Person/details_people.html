@@ -109,10 +109,12 @@
 </div>
 <!-- JavaScript for Modal on Errors -->
 <script>
-  {% if form.errors %}
-    const editPersonModal = new bootstrap.Modal(document.getElementById('editPersonModal'));
-    editPersonModal.show();
-  {% endif %}
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if form.errors %}
+      const editPersonModal = new bootstrap.Modal(document.getElementById('editPersonModal'));
+      editPersonModal.show();
+    {% endif %}
+  })
 </script>
 
 <style>

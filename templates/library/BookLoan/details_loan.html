@@ -142,11 +142,11 @@
             {% endif %}
           </div>
           <div class="mb-3">
-            <label for="{{ form.status.id_for_label }}" class="form-label" style="color: #040404;">Status do Empréstimo</label>
-            {{ form.status }}
-            {% if form.status.errors %}
+            <label for="{{ form.status_book.id_for_label }}" class="form-label" style="color: #040404;">Status do Empréstimo</label>
+            {{ form.status_book }}
+            {% if form.status_book.errors %}
               <div class="text-danger small mt-1">
-                {% for error in form.status.errors %}
+                {% for error in form.status_book.errors %}
                   {{ error }}
                 {% endfor %}
               </div>
@@ -171,10 +171,12 @@
 
 <!-- JavaScript for Modal on Errors -->
 <script>
-  {% if form.errors %}
-    const editLoanModal = new bootstrap.Modal(document.getElementById('editLoanModal'));
-    editLoanModal.show();
-  {% endif %}
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if form.errors %}
+      const editLoanModal = new bootstrap.Modal(document.getElementById('editLoanModal'));
+      editLoanModal.show();
+    {% endif %}
+  })
 </script>
 
 <style>

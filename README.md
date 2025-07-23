@@ -3,12 +3,17 @@
 ![BookOwl Logo](https://github.com/user-attachments/assets/743d47c6-1f72-4002-9d1a-87f02fba6b67#width=150&height=150)
 
 [![Status](https://img.shields.io/badge/STATUS-EM%20PRODUCAO-green?style=for-the-badge)](https://github.com/GabrielDev969/BookOwl)
-[![Version](https://img.shields.io/badge/Versão-1.1.1-green?style=for-the-badge)](https://github.com/GabrielDev969/BookOwl)
+[![Version](https://img.shields.io/badge/Versão-1.3.0-green?style=for-the-badge)](https://github.com/GabrielDev969/BookOwl)
 [![License](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)](LICENSE)
 
 Bem-vindo ao **BookOwl**, um sistema intuitivo para gerenciar bibliotecas de igrejas, empresas ou coleções pessoais! Criado com ❤️ para organizar livros e empréstimos de forma simples e eficiente, o BookOwl nasceu de uma necessidade real: ajudar uma irmã da nossa igreja a gerenciar a biblioteca local.
 
-> ⚠️ **Aviso Importante**: O recurso de registro (signup) está temporariamente desativado. Para acessar o sistema, entre em contato com o administrador em [gabriel.dev969@gmail.com](mailto:gabriel.dev969@gmail.com) para obter uma conta.
+> ⚠️ **Aviso Importante**: O recurso de registro (signup) está temporariamente desativado no serviço online. Para acessar o sistema, entre em contato com o administrador em [gabriel.dev969@gmail.com](mailto:gabriel.dev969@gmail.com) para obter uma conta.
+
+> ℹ **Informações**: 
+> Você pode ativar o cadastro no ambiente de desenvolvimento, mudando a view na url de signup para ```view.signup``` .
+>
+> Em desenvolvimento retire o DATABASE_URL do seu .env para utilizar o banco .sqlite a menos que esteja usando outro tipo de banco. 
 
 ## 📚 Objetivo
 
@@ -19,7 +24,7 @@ O BookOwl foi desenvolvido para simplificar o gerenciamento de bibliotecas, com 
 - **Gerenciamento de Livros**: Cadastre, edite e organize livros com título, autor, descrição e status.
 - **Controle de Empréstimos**: Monitore empréstimos, datas de devolução e status em tempo real.
 - **Gestão de Pessoas**: Administre informações de leitores, incluindo nome, e-mail, telefone e endereço.
-- **Interface Moderna**: Design responsivo com uma paleta de cores elegante (#e17122, #faf8e9, #e0a673, #040404).
+- **Interface Moderna**: Design responsivo com uma paleta de cores elegante.
 - **Acessibilidade**: Suporte a navegação por teclado e alto contraste para uma experiência inclusiva.
 
 ## 🚀 Instalação

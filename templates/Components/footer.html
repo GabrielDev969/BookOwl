@@ -1,0 +1,146 @@
+{% block style %}
+<style>
+/* Footer styles */
+footer {
+    background-color: #faf8e9;
+    border-top: 1px solid #e0a673;
+    padding: 0.5rem 1rem; /* Reduced padding */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.75rem; /* Smaller font size */
+    color: #040404;
+}
+
+footer .btn-feedback {
+    background-color: #e17122;
+    color: #faf8e9;
+    width: 32px; /* Smaller button */
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+footer .btn-feedback:hover {
+    background-color: #e0a673;
+    transform: translateY(-2px);
+}
+
+/* Modal styles */
+.modal-content {
+    border-radius: 12px;
+    border: 1px solid #e0a673;
+}
+
+.form-control, .form-select {
+    background-color: #faf8e9;
+    border: 1px solid #e0a673;
+    border-radius: 8px;
+    color: #040404;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #e17122;
+    box-shadow: 0 0 0 3px rgba(225, 113, 34, 0.2);
+}
+
+@media (max-width: 576px) {
+    footer {
+        padding: 0.5rem 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    footer p {
+        font-size: 0.7rem; /* Smaller font on mobile */
+    }
+
+    footer .btn-feedback {
+        width: 28px; /* Smaller button on mobile */
+        height: 28px;
+    }
+
+    footer .btn-feedback i {
+        font-size: 0.9rem; /* Smaller icon on mobile */
+    }
+}
+</style>
+{% endblock %}
+
+<!-- Footer -->
+<footer class="fixed-bottom">
+    <p>
+        <span class="badge rounded-pill" style="background-color: #e17122;">
+            v{{ APP_VERSION }}
+        </span>
+    </p>
+    {% if user.is_authenticated %}
+        <button type="button" class="btn btn-feedback" data-bs-toggle="modal" data-bs-target="#feedbackModal" title="Enviar Feedback ou Pedir Ajuda" aria-label="Enviar feedback ou pedir ajuda">
+            <i class="fas fa-question-circle"></i>
+        </button>
+    {% endif %}
+</footer>
+
+{% if user.is_authenticated %}
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #faf8e9;">
+            <div class="modal-header" style="border-bottom: 1px solid #e0a673;">
+                <h5 class="modal-title" id="feedbackModalLabel" style="color: #040404; font-weight: 600;">Enviar Feedback ou Pedir Ajuda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p style="color: #040404; font-size: 0.95rem;">Sua mensagem será enviada para nosso grupo no Telegram, onde nossa equipe responderá o mais rápido possível.</p>
+                <form method="post" action="{% url 'submit_feedback' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="feedbackName" class="form-label" style="color: #040404;">Nome</label>
+                        <input type="text" class="form-control" id="feedbackName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="feedbackEmail" class="form-label" style="color: #040404;">E-mail (opcional)</label>
+                        <input type="email" class="form-control" id="feedbackEmail" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="feedbackMessage" class="form-label" style="color: #040404;">Mensagem</label>
+                        <textarea class="form-control" id="feedbackMessage" name="message" rows="4" required></textarea>
+                    </div>
+                    {% if form.non_field_errors %}
+                        <div class="text-danger small mb-3">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #040404; color: #faf8e9;">Cancelar</button>
+                        <button type="submit" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9;">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+
+    // Abre a modal de criação em caso de erros no formulário
+    {% if form.errors %}
+      feedbackModal.show();
+    {% endif %}
+  });
+</script>
+{% endblock %}

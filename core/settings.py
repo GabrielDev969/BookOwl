@@ -11,8 +11,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-APP_VERSION = '1.3.0'
-
 # --- CONFIGURAÇÕES DE SEGURANÇA ---
 # A SECRET_KEY é lida da variável de ambiente. NUNCA a deixe no código.
 SECRET_KEY = os.environ.get('SECRET_KEY_DJANGO')
@@ -86,7 +84,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.app_version_processor',
             ],
         },
     },

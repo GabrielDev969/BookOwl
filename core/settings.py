@@ -23,7 +23,7 @@ DEBUG = os.environ.get('DEBUG') == 'True'
 
 # --- CONFIGURAÇÕES DE REDE (HOSTS) ---
 # Configuração dinâmica de ALLOWED_HOSTS para Railway.
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['www.bookowl.com.br', 'bookowl.com.br']
 RAILWAY_APP_HOSTNAME = os.environ.get('RAILWAY_APP_HOSTNAME')
 if RAILWAY_APP_HOSTNAME:
     # Adiciona o domínio do Railway quando a variável estiver disponível

@@ -18,17 +18,31 @@ import os
 def view_books(request):
     """
     View para listar livros, buscar, criar novos livros e importar arquivos.
+    Exibe todos os livros quando nenhum filtro de status é aplicado.
+    Suporta ordenação por título (A-Z ou Z-A).
     """
     # Busca e paginação
     query = request.GET.get('search', '')
+    status_filters = request.GET.getlist('status')
+    ordering = request.GET.get('ordering', 'title') 
+
+    # VAlida ordenação para evitar SQL inject
+    if ordering not in ['title', '-title']:
+        ordering = 'title'
+
+    books = Book.objects.filter(library=request.user.library)
     if query:
-        books = Book.objects.filter(
-            title__icontains=query, library=request.user.library
-        ).union(
-            Book.objects.filter(author__icontains=query, library=request.user.library)
-        ).order_by('title')
+        books = books.filter(
+            Q(title__icontains=query) | Q(author__icontains=query)
+        )
+    
+    # Verifica os filtros
+    if status_filters and status_filters != ['']:
+        books = books.filter(status__in=status_filters)
     else:
-        books = Book.objects.filter(library=request.user.library).order_by('title')
+        status_filters = [status[0] for status in Book._meta.get_field('status').choices]
+
+    books = books.order_by(ordering)
 
     paginator = Paginator(books, 30)
     page = request.GET.get('page')
@@ -41,12 +55,17 @@ def view_books(request):
 
     # Inicializa o formulário de criação de livro
     form = BookForm(user=request.user)
+    book_status_choices = Book._meta.get_field('status').choices
+
     context = {
         'books': book_paginated,
         'query': query,
         'form': form,
         'data_for_review': [],
-        'has_errors': False
+        'has_errors': False,
+        'selected_statuses': status_filters,
+        'book_status_choices': book_status_choices,
+        'ordering': ordering,
     }
 
     if request.method == 'POST':
@@ -240,31 +259,44 @@ def details_people(request, person_id):
 
 @login_required
 def view_loans(request):
+    """
+    View para listar empréstimos, buscar e criar novos empréstimos.
+    Exibe todos os empréstimos quando nenhum filtro de status é aplicado.
+    """
     if not request.user.library:
         messages.warning(request, "Você precisa estar associado a uma biblioteca para ver os empréstimos.")
         loans = BookLoan.objects.none()
         form = BookLoanForm(user=request.user)
-        return render(request, 'library/loan/view_loans.html', context={'loans': loans, 'form': form})
+        return render(request, 'library/BookLoan/view_loans.html', context={'loans': loans, 'form': form})
 
     query = request.GET.get('search', '')
+    status_filters = request.GET.getlist('status')
+    ordering = request.GET.get('ordering', '-loan_date') 
+
+    loans = BookLoan.objects.filter(library=request.user.library)
     if query:
-        loan = BookLoan.objects.filter(
-            Q(books__title__icontains=query)   | Q(books__author__icontains=query) |
-            Q(person__name__icontains=query),
-            library=request.user.library
-        ).order_by('loan_date')
+        loans = loans.filter(
+            Q(books__title__icontains=query) | Q(books__author__icontains=query) |
+            Q(person__name__icontains=query)
+        )
+
+    if status_filters and status_filters != ['']:
+        loans = loans.filter(status__in=status_filters)
     else:
-        loan = BookLoan.objects.filter(library=request.user.library).order_by('loan_date')
+        status_filters = [status[0] for status in BookLoan._meta.get_field('status').choices]
 
-    paginator = Paginator(loan, 30) 
+    loans = loans.order_by(ordering)
+
+    paginator = Paginator(loans, 30)
     page = request.GET.get('page')
-
     try:
         loan_paginated = paginator.page(page)
     except PageNotAnInteger:
         loan_paginated = paginator.page(1)
     except EmptyPage:
         loan_paginated = paginator.page(paginator.num_pages)
+
+    loan_status_choices = BookLoan._meta.get_field('status').choices
 
     if request.method == 'POST':
         form = BookLoanForm(request.POST, user=request.user)
@@ -277,10 +309,13 @@ def view_loans(request):
     else:
         form = BookLoanForm(user=request.user)
 
-    context={
+    context = {
         'loans': loan_paginated,
-        'query': query, 
-        'form': form
+        'query': query,
+        'form': form,
+        'selected_statuses': status_filters,
+        'ordering': ordering,
+        'loan_status_choices': loan_status_choices,
     }
 
     return render(request, 'library/BookLoan/view_loans.html', context)

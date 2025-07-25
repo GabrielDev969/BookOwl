@@ -21,15 +21,6 @@
             {% endfor %}
             {% if loan.books.all|length > 2 %} e mais {{ loan.books.all|length|add:"-2" }} livro(s){% endif %}
           </p>
-          {% if loan.books.all %}
-            <div class="row g-2 mb-3">
-              {% for book in loan.books.all|slice:":2" %}
-                <div class="col-6">
-                  <img src="{{ book.book_image.url|default:'/static/images/default_book.jpg' }}" alt="{{ book.title }}" class="img-fluid" style="max-height: 100px; object-fit: cover; border-radius: 8px;">
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
           <p class="card-text mb-2" style="color: #040404;"><strong>Pessoa:</strong> {{ loan.person.name }}</p>
           <p class="card-text mb-2" style="color: #040404;">
             <strong>Data de Empréstimo:</strong>
@@ -62,6 +53,7 @@
           </p>
         </div>
       </div>
+      
       {% if loan.status == 'active' or loan.status == 'awaiting_pickup' or loan.status == 'overdue' %}
         <div class="card shadow-sm border-0 mt-4 animate-card" style="background-color: #faf8e9; border-radius: 12px;">
           <div class="card-body d-flex justify-content-center gap-3 py-3">
@@ -84,6 +76,12 @@
                 {% csrf_token %}
                 <button type="submit" class="btn rounded-circle" title="Confirmar Retirada" style="background-color: #e0a673; color: #040404; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
                   <i class="fas fa-hand-holding"></i>
+                </button>
+              </form>
+              <form action="{% url 'library:cancel_loan' loan.id %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn rounded-circle" title="Cancelar Empréstimo" style="background-color: #dc3545; color: #faf8e9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                  <i class="fas fa-times"></i>
                 </button>
               </form>
             {% endif %}

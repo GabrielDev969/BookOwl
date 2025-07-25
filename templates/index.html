@@ -85,6 +85,51 @@
             border-color: #e17122;
         }
 
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(224, 166, 115, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-logo {
+            width: 100px; /* Adjust size as needed */
+            height: 100px;
+            animation: spin-pause 2s infinite;
+        }
+
+        /* Rotation animation with pause */
+        @keyframes spin-pause {
+            0% {
+                transform: rotate(0deg);
+            }
+            50% {
+                transform: rotate(360deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Efeito de pausa ao desacelerar animação */
+        .loader-logo {
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
         /* Fade-in animation */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
@@ -114,6 +159,11 @@
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <img src="{% static 'favicon.ico' %}" alt="Loading Logo" class="loader-logo">
+    </div>
+
     <!-- Toast notifications -->
     <div class="toast-container">
         {% if messages %}
@@ -151,6 +201,18 @@
                 const bsToast = new bootstrap.Toast(toast);
                 bsToast.show();
             });
+
+            // Ocultar sobreposição de carregamento quando a página estiver totalmente carregada
+            window.onload = function() {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.classList.add('hidden');
+                    // Remove do DOM depois que acaba para evitar a acessibilidade
+                    setTimeout(() => {
+                        loadingOverlay.remove();
+                    }, 500); // Duração de transição
+                }
+            };
         });
     </script>
     <!-- Custom scripts -->

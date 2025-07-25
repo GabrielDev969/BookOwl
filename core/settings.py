@@ -11,7 +11,7 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-APP_VERSION = '1.3.0'
+APP_VERSION = '1.4.0'
 
 # --- CONFIGURAÇÕES DE SEGURANÇA ---
 # A SECRET_KEY é lida da variável de ambiente. NUNCA a deixe no código.

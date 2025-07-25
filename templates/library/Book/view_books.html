@@ -19,6 +19,9 @@
         {% for status in selected_statuses %}
           <input type="hidden" name="status" value="{{ status }}">
         {% endfor %}
+        {% if ordering %}
+          <input type="hidden" name="ordering" value="{{ ordering }}">
+        {% endif %}
         <button type="submit" class="btn rounded-pill px-4" style="background-color: #e17122; color: #faf8e9;">
           <i class="fas fa-search"></i>
         </button>
@@ -66,7 +69,7 @@
     <ul class="pagination justify-content-center gap-2">
       {% if books.has_previous %}
         <li class="page-item">
-          <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}page={{ books.previous_page_number }}" aria-label="Anterior" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
+          <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}{% if ordering %}ordering={{ ordering }}&{% endif %}page={{ books.previous_page_number }}" aria-label="Anterior" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
             <i class="fas fa-chevron-left"></i>
           </a>
         </li>
@@ -85,14 +88,14 @@
           </li>
         {% elif num > books.number|add:'-3' and num < books.number|add:'3' %}
           <li class="page-item">
-            <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}page={{ num }}" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">{{ num }}</a>
+            <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}{% if ordering %}ordering={{ ordering }}&{% endif %}page={{ num }}" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">{{ num }}</a>
           </li>
         {% endif %}
       {% endfor %}
       
       {% if books.has_next %}
         <li class="page-item">
-          <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}page={{ books.next_page_number }}" aria-label="Próximo" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
+          <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}{% if ordering %}ordering={{ ordering }}&{% endif %}page={{ books.next_page_number }}" aria-label="Próximo" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
             <i class="fas fa-chevron-right"></i>
           </a>
         </li>
@@ -157,6 +160,23 @@
                     </label>
                   </div>
                 {% endfor %}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" style="color: #040404; font-weight: 500;">Ordenar por Título</label>
+              <div class="d-flex flex-column gap-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="ordering" value="title" id="order_asc" {% if ordering == 'title' or not ordering %}checked{% endif %}>
+                  <label class="form-check-label" for="order_asc" style="color: #040404;">
+                    A-Z
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="ordering" value="-title" id="order_desc" {% if ordering == '-title' %}checked{% endif %}>
+                  <label class="form-check-label" for="order_desc" style="color: #040404;">
+                    Z-A
+                  </label>
+                </div>
               </div>
             </div>
             {% if query %}

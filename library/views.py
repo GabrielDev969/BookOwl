@@ -19,10 +19,16 @@ def view_books(request):
     """
     View para listar livros, buscar, criar novos livros e importar arquivos.
     Exibe todos os livros quando nenhum filtro de status é aplicado.
+    Suporta ordenação por título (A-Z ou Z-A).
     """
     # Busca e paginação
     query = request.GET.get('search', '')
     status_filters = request.GET.getlist('status')
+    ordering = request.GET.get('ordering', 'title') 
+
+    # VAlida ordenação para evitar SQL inject
+    if ordering not in ['title', '-title']:
+        ordering = 'title'
 
     books = Book.objects.filter(library=request.user.library)
     if query:
@@ -30,13 +36,13 @@ def view_books(request):
             Q(title__icontains=query) | Q(author__icontains=query)
         )
     
-    # Verfica os filtros
+    # Verifica os filtros
     if status_filters and status_filters != ['']:
         books = books.filter(status__in=status_filters)
     else:
         status_filters = [status[0] for status in Book._meta.get_field('status').choices]
 
-    books = books.order_by('title')
+    books = books.order_by(ordering)
 
     paginator = Paginator(books, 30)
     page = request.GET.get('page')
@@ -59,6 +65,7 @@ def view_books(request):
         'has_errors': False,
         'selected_statuses': status_filters,
         'book_status_choices': book_status_choices,
+        'ordering': ordering,
     }
 
     if request.method == 'POST':

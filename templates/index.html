@@ -7,6 +7,7 @@
     <meta name="description" content="BookOwl - Sistema de Gerenciamento de Biblioteca">
     <title>BookOwl {% block title %}{% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="preload" href="{% static 'favicon.ico' %}" as="image">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome CSS -->
@@ -157,12 +158,26 @@
             }
         }
     </style>
+    <script>
+        // Cria e anexa imediatamente um spinner de carregamento
+        (function() {
+            console.log('Creating loading spinner');
+            let overlay = document.getElementById('loadingOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'loadingOverlay';
+                overlay.className = 'loading-overlay';
+                const img = document.createElement('img');
+                img.src = "{% static 'favicon.ico' %}";
+                img.alt = 'BookOwl Logo';
+                img.className = 'loader-logo';
+                overlay.appendChild(img);
+                document.documentElement.appendChild(overlay);
+            }
+        })();
+    </script>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <img src="{% static 'favicon.ico' %}" alt="Loading Logo" class="loader-logo">
-    </div>
 
     <!-- Toast notifications -->
     <div class="toast-container">
@@ -206,11 +221,16 @@
             window.onload = function() {
                 const loadingOverlay = document.getElementById('loadingOverlay');
                 if (loadingOverlay) {
-                    loadingOverlay.classList.add('hidden');
-                    // Remove do DOM depois que acaba para evitar a acessibilidade
+                    const minDisplayTime = 500; 
+                    const loadStart = performance.now();
+                    const elapsed = performance.now() - loadStart;
+                    const remaining = Math.max(0, minDisplayTime - elapsed);
                     setTimeout(() => {
-                        loadingOverlay.remove();
-                    }, 500); // Duração de transição
+                        loadingOverlay.classList.add('hidden');
+                        setTimeout(() => {
+                            loadingOverlay.remove();
+                        }, 500);
+                    }, remaining);
                 }
             };
         });

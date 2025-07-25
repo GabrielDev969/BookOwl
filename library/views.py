@@ -124,8 +124,6 @@ def view_books(request):
             context['data_for_review'] = result['data_for_review']
             context['has_errors'] = len(result['errors']) > 0
 
-    if status_filters or query:
-        messages.success(request, 'Filtros aplicados com sucesso!')
     return render(request, 'library/Book/view_books.html', context)
 
 @login_required

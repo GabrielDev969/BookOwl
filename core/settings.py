@@ -38,6 +38,7 @@ if DEBUG:
 CSRF_TRUSTED_ORIGINS = []
 if RAILWAY_APP_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f"https://{RAILWAY_APP_HOSTNAME}" )
+    CSRF_TRUSTED_ORIGINS.append(f"https://www.bookowl.com.br" )
 
 # Força o redirecionamento para HTTPS em produção.
 # A variável IS_HEROKU é um nome comum que o Railway também pode usar.

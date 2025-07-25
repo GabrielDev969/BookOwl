@@ -6,7 +6,7 @@
 <div class="container py-5">
   <h1 class="mb-4 text-center" style="color: #040404; font-weight: 600;">Lista de Livros</h1>
   
-  <!-- Search and Action Button -->
+  <!-- Search, Filter, and Action Button -->
   <div class="row mb-5 justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
       <form method="get" class="d-flex align-items-center gap-2" id="searchForm">
@@ -16,8 +16,15 @@
           </span>
           <input type="text" name="search" class="form-control border-0" placeholder="Pesquisar por título ou autor" value="{{ query|default_if_none:'' }}" style="background-color: #faf8e9; color: #040404;">
         </div>
+        {% for status in selected_statuses %}
+          <input type="hidden" name="status" value="{{ status }}">
+        {% endfor %}
         <button type="submit" class="btn rounded-pill px-4" style="background-color: #e17122; color: #faf8e9;">
           <i class="fas fa-search"></i>
+        </button>
+        <button type="button" class="btn rounded-pill px-4 position-relative" data-bs-toggle="modal" data-bs-target="#filterBookModal" style="background-color: #e0a673; color: #faf8e9;" title="Filtrar Livros" aria-label="Filtrar livros">
+          <i class="fas fa-filter"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ selected_statuses|length }}</span>
         </button>
         <button type="button" class="btn rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#actionModal" style="background-color: #e0a673; color: #faf8e9;">
           <i class="fas fa-plus"></i>
@@ -31,7 +38,7 @@
     {% for book in books %}
     <div class="col">
       <a href="{% url 'library:details_book' book.id %}" class="text-decoration-none">
-        <div class="card h-100 shadow-sm border-0" style="background-color: #faf8e9; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+        <div class="card h-100 shadow-sm border-0 animate-card" style="background-color: #faf8e9; transition: transform 0.3s ease, box-shadow 0.3s ease;">
           <div class="card-body d-flex flex-column justify-content-between">
             <div>
               <h5 class="card-title mb-1" style="color: #040404; font-weight: 600;">{{ book.title }}</h5>
@@ -59,7 +66,7 @@
     <ul class="pagination justify-content-center gap-2">
       {% if books.has_previous %}
         <li class="page-item">
-          <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ books.previous_page_number }}" aria-label="Anterior" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
+          <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}page={{ books.previous_page_number }}" aria-label="Anterior" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
             <i class="fas fa-chevron-left"></i>
           </a>
         </li>
@@ -78,14 +85,14 @@
           </li>
         {% elif num > books.number|add:'-3' and num < books.number|add:'3' %}
           <li class="page-item">
-            <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">{{ num }}</a>
+            <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}page={{ num }}" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">{{ num }}</a>
           </li>
         {% endif %}
       {% endfor %}
       
       {% if books.has_next %}
         <li class="page-item">
-          <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ books.next_page_number }}" aria-label="Próximo" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
+          <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}page={{ books.next_page_number }}" aria-label="Próximo" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
             <i class="fas fa-chevron-right"></i>
           </a>
         </li>
@@ -118,11 +125,49 @@
             </button>
             <p class="text-center mt-3" style="color: #040404; font-size: 0.9rem;">
               Baixe o exemplo de importação em 
-              <a href="{% static 'examples/example_import_csv.csv' %}" class="example-link" download>.csv</a> 
+              <a href="{% static 'examples/example_import_csv.csv' %}" class="text-decoration-none" style="color: #e17122;" download>.csv</a> 
               ou 
-              <a href="{% static 'examples/example_import_xlsx.xlsx' %}" class="example-link" download>.xlsx</a>
+              <a href="{% static 'examples/example_import_xlsx.xlsx' %}" class="text-decoration-none" style="color: #e17122;" download>.xlsx</a>
             </p>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Filtering Books -->
+  <div class="modal fade" id="filterBookModal" tabindex="-1" aria-labelledby="filterBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: #faf8e9; border: 1px solid #e0a673; border-radius: 12px;">
+        <div class="modal-header" style="border-bottom: 1px solid #e0a673;">
+          <h5 class="modal-title" id="filterBookModalLabel" style="color: #040404; font-weight: 600;">Filtrar Livros</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="get" action="{% url 'library:view_books' %}" id="filterBookForm">
+            <div class="mb-3">
+              <label class="form-label" style="color: #040404; font-weight: 500;">Status do Livro</label>
+              <div class="d-flex flex-column gap-2">
+                {% for status_value, status_display in book_status_choices %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="status" value="{{ status_value }}" id="status_{{ status_value }}"
+                           {% if selected_statuses|length == book_status_choices|length or status_value in selected_statuses %}checked{% endif %}>
+                    <label class="form-check-label" for="status_{{ status_value }}" style="color: #040404;">
+                      {{ status_display }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% if query %}
+              <input type="hidden" name="search" value="{{ query }}">
+            {% endif %}
+            <div class="d-flex justify-content-end gap-2">
+              <a href="{% url 'library:view_books' %}{% if query %}?search={{ query }}{% endif %}" class="btn rounded-pill" style="background-color: #dc3545; color: #faf8e9;">Limpar Filtros</a>
+              <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #040404; color: #faf8e9;">Cancelar</button>
+              <button type="submit" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9;">Aplicar Filtros</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -217,6 +262,7 @@
             </div>
             <div class="modal-footer" style="border-top: 1px solid #e0a673;">
               <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #040404; color: #faf8e9;">Cancelar</button>
+              <button type="submit" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9;">Importar</button>
             </div>
           </form>
         </div>
@@ -274,19 +320,25 @@
 
 <!-- JavaScript for Button and Modals -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const createBookModal = new bootstrap.Modal(document.getElementById('createBookModal'));
-    const uploadFileModal = new bootstrap.Modal(document.getElementById('uploadFileModal'));
-    const reviewBooksModal = new bootstrap.Modal(document.getElementById('reviewBooksModal'));
-    const importForm = document.getElementById('importForm');
-    const fileInput = document.getElementById('fileInput');
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize modals
+  const createBookModal = new bootstrap.Modal(document.getElementById('createBookModal'));
+  const uploadFileModal = new bootstrap.Modal(document.getElementById('uploadFileModal'));
+  const reviewBooksModal = new bootstrap.Modal(document.getElementById('reviewBooksModal'));
+  const filterBookModalElement = document.getElementById('filterBookModal');
+  const importForm = document.getElementById('importForm');
+  const filterForm = document.getElementById('filterBookForm');
+  const fileInput = document.getElementById('fileInput');
 
-    // Aciona o diálogo de seleção de arquivo quando a modal de upload é exibida
+  // Aciona o diálogo de seleção de arquivo quando a modal de upload é exibida
+  if (document.getElementById('uploadFileModal')) {
     document.getElementById('uploadFileModal').addEventListener('shown.bs.modal', function() {
       fileInput.click();
     });
+  }
 
-    // Envia o formulário automaticamente ao selecionar um arquivo
+  // Envia o formulário automaticamente ao selecionar um arquivo
+  if (fileInput) {
     fileInput.addEventListener('change', function() {
       if (this.files.length > 0) {
         importForm.submit();
@@ -297,17 +349,39 @@
     fileInput.addEventListener('cancel', function() {
       uploadFileModal.hide();
     });
+  }
 
-    // Abre a modal de revisão se houver dados
-    {% if data_for_review %}
-      reviewBooksModal.show();
-    {% endif %}
+  // Abre a modal de revisão se houver dados
+  {% if data_for_review %}
+    reviewBooksModal.show();
+  {% endif %}
 
-    // Abre a modal de criação em caso de erros no formulário
-    {% if form.errors %}
-      createBookModal.show();
-    {% endif %}
-  });
+  // Abre a modal de criação em caso de erros no formulário
+  {% if form.errors %}
+    createBookModal.show();
+  {% endif %}
+
+  // Ensure at least one status is checked and prevent empty submission
+  if (filterBookModalElement) {
+    filterBookModalElement.addEventListener('show.bs.modal', function() {
+      const checkboxes = document.querySelectorAll('input[name="status"]');
+      const anyChecked = document.querySelectorAll('input[name="status"]:checked').length;
+      if (!anyChecked) {
+        checkboxes.forEach(checkbox => checkbox.checked = true);
+      }
+    });
+  }
+
+  if (filterForm) {
+    filterForm.addEventListener('submit', function(e) {
+      const statusChecked = document.querySelectorAll('input[name="status"]:checked').length;
+      if (!statusChecked) {
+        e.preventDefault();
+        alert('Selecione pelo menos um status.');
+      }
+    });
+  }
+});
 </script>
 
 <style>
@@ -335,12 +409,19 @@
   }
 
   /* Search bar, button, and inputs */
-  .input-group, .form-control {
+  .input-group, .form-control, .form-check-input {
     transition: box-shadow 0.3s ease;
   }
 
-  .input-group:focus-within, .form-control:focus {
+  .input-group:focus-within, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 3px rgba(225, 113, 34, 0.2) !important;
+  }
+
+  .form-check-input {
+    background-color: #faf8e9;
+    border: 1px solid #e0a673;
+    border-radius: 8px;
+    color: #040404;
   }
 
   .btn {
@@ -412,6 +493,11 @@
 
   .error-cell {
     background-color: #ffe6e6;
+  }
+
+  /* Badge */
+  .badge {
+    font-size: 0.75rem;
   }
 
   /* Responsive adjustments */

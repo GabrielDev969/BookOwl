@@ -5,18 +5,28 @@
 <div class="container py-5">
   <h1 class="mb-5 text-center" style="color: #040404; font-weight: 600;">Lista de Empréstimos</h1>
   
-  <!-- Search and Add Button -->
+  <!-- Search, Filter, and Add Button -->
   <div class="row mb-5 justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
-      <form method="get" class="d-flex align-items-center gap-2">
+      <form method="get" class="d-flex align-items-center gap-2" id="searchForm">
         <div class="input-group shadow-sm" style="border-radius: 50px; overflow: hidden;">
           <span class="input-group-text bg-white border-0">
             <i class="fas fa-search" style="color: #e17122;"></i>
           </span>
           <input type="text" name="search" class="form-control border-0" placeholder="Pesquisar por título ou pessoa" value="{{ query|default_if_none:'' }}" style="background-color: #faf8e9; color: #040404;">
         </div>
+        {% for status in selected_statuses %}
+          <input type="hidden" name="status" value="{{ status }}">
+        {% endfor %}
+        {% if ordering %}
+          <input type="hidden" name="ordering" value="{{ ordering }}">
+        {% endif %}
         <button type="submit" class="btn rounded-pill px-4" style="background-color: #e17122; color: #faf8e9;">
           <i class="fas fa-search"></i>
+        </button>
+        <button type="button" class="btn rounded-pill px-4 position-relative" data-bs-toggle="modal" data-bs-target="#filterLoanModal" style="background-color: #e0a673; color: #faf8e9;" title="Filtrar Empréstimos" aria-label="Filtrar empréstimos">
+          <i class="fas fa-filter"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ selected_statuses|length }}</span>
         </button>
         {% if request.user.library %}
           <button type="button" class="btn rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#createLoanModal" style="background-color: #e0a673; color: #faf8e9;">
@@ -36,7 +46,7 @@
           <div class="card-body d-flex flex-column justify-content-between">
             <div>
               <h5 class="card-title mb-2" style="color: #040404; font-weight: 600;">
-                X000{{ loan.cd_bookloan}}
+                X000{{ loan.cd_bookloan }}
               </h5>
               <p class="card-text mb-2" style="color: #040404; opacity: 0.7;"><strong>Pessoa:</strong> {{ loan.person.name }}</p>
               <p class="card-text mb-2" style="color: #040404; opacity: 0.7;">
@@ -85,7 +95,7 @@
     <ul class="pagination justify-content-center gap-2">
       {% if loans.has_previous %}
         <li class="page-item">
-          <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ loans.previous_page_number }}" aria-label="Anterior" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
+          <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}{% if ordering %}ordering={{ ordering }}&{% endif %}page={{ loans.previous_page_number }}" aria-label="Anterior" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
             <i class="fas fa-chevron-left"></i>
           </a>
         </li>
@@ -104,14 +114,14 @@
           </li>
         {% elif num > loans.number|add:'-3' and num < loans.number|add:'3' %}
           <li class="page-item">
-            <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">{{ num }}</a>
+            <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}{% if ordering %}ordering={{ ordering }}&{% endif %}page={{ num }}" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">{{ num }}</a>
           </li>
         {% endif %}
       {% endfor %}
       
       {% if loans.has_next %}
         <li class="page-item">
-          <a class="page-link rounded-pill" href="?{% if query %}q={{ query }}&{% endif %}page={{ loans.next_page_number }}" aria-label="Próximo" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
+          <a class="page-link rounded-pill" href="?{% if query %}search={{ query }}&{% endif %}{% for status in selected_statuses %}status={{ status }}&{% endfor %}{% if ordering %}ordering={{ ordering }}&{% endif %}page={{ loans.next_page_number }}" aria-label="Próximo" style="background-color: #faf8e9; color: #e17122; border: 1px solid #e17122;">
             <i class="fas fa-chevron-right"></i>
           </a>
         </li>
@@ -132,7 +142,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content" style="background-color: #faf8e9; border: 1px solid #e17122; border-radius: 12px;">
         <div class="modal-header" style="border-bottom: 1px solid #e0a673;">
-          <h5 class="modal-title" id="createLoanModalLabel" style="color: #040404; font-weight: 600;">Criar Novo E</h5>
+          <h5 class="modal-title" id="createLoanModalLabel" style="color: #040404; font-weight: 600;">Criar Novo Empréstimo</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -199,16 +209,99 @@
     </div>
   </div>
   {% endif %}
+
+  <!-- Modal for Filtering Loans -->
+  <div class="modal fade" id="filterLoanModal" tabindex="-1" aria-labelledby="filterLoanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: #faf8e9; border: 1px solid #e0a673; border-radius: 12px;">
+        <div class="modal-header" style="border-bottom: 1px solid #e0a673;">
+          <h5 class="modal-title" id="filterLoanModalLabel" style="color: #040404; font-weight: 600;">Filtrar Empréstimos</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="get" action="{% url 'library:view_loans' %}" id="filterLoanForm">
+            <div class="mb-3">
+              <label class="form-label" style="color: #040404; font-weight: 500;">Status do Empréstimo</label>
+              <div class="d-flex flex-column gap-2">
+                {% for status_value, status_display in loan_status_choices %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="status" value="{{ status_value }}" id="status_{{ status_value }}"
+                           {% if selected_statuses|length == loan_status_choices|length or status_value in selected_statuses %}checked{% endif %}>
+                    <label class="form-check-label" for="status_{{ status_value }}" style="color: #040404;">
+                      {{ status_display }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" style="color: #040404; font-weight: 500;">Ordenar por Data de Criação</label>
+              <div class="d-flex flex-column gap-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="ordering" value="-loan_date" id="order_newest" {% if ordering == '-loan_date' or not ordering %}checked{% endif %}>
+                  <label class="form-check-label" for="order_newest" style="color: #040404;">
+                    Mais recentes primeiro
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="ordering" value="loan_date" id="order_oldest" {% if ordering == 'loan_date' %}checked{% endif %}>
+                  <label class="form-check-label" for="order_oldest" style="color: #040404;">
+                    Mais antigos primeiro
+                  </label>
+                </div>
+              </div>
+            </div>
+            {% if query %}
+              <input type="hidden" name="search" value="{{ query }}">
+            {% endif %}
+            <div class="d-flex justify-content-end gap-2">
+              <a href="{% url 'library:view_loans' %}{% if query %}?search={{ query }}{% endif %}" class="btn rounded-pill" style="background-color: #dc3545; color: #faf8e9;">Limpar Filtros</a>
+              <button type="button" class="btn rounded-pill" data-bs-dismiss="modal" style="background-color: #040404; color: #faf8e9;">Cancelar</button>
+              <button type="submit" class="btn rounded-pill" style="background-color: #e17122; color: #faf8e9;">Aplicar Filtros</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- JavaScript for Modal on Errors -->
+<!-- JavaScript for Modal on Errors and Default Filter -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    {% if form.errors %}
-      const createLoanModal = new bootstrap.Modal(document.getElementById('createLoanModal'));
-      createLoanModal.show();
-    {% endif %}
-  })
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize modals
+  const createLoanModalElement = document.getElementById('createLoanModal');
+  const filterLoanModalElement = document.getElementById('filterLoanModal');
+  const filterLoanForm = document.getElementById('filterLoanForm');
+
+  // Show create loan modal if there are form errors
+  if (createLoanModalElement && {% if form.errors %}true{% else %}false{% endif %}) {
+    const createLoanModal = new bootstrap.Modal(createLoanModalElement);
+    createLoanModal.show();
+  }
+
+  // Ensure at least one status is checked on filter modal open
+  if (filterLoanModalElement) {
+    filterLoanModalElement.addEventListener('show.bs.modal', function() {
+      const checkboxes = document.querySelectorAll('input[name="status"]');
+      const anyChecked = document.querySelectorAll('input[name="status"]:checked').length;
+      if (!anyChecked) {
+        checkboxes.forEach(checkbox => checkbox.checked = true);
+      }
+    });
+  }
+
+  // Prevent filter form submission with no status selected
+  if (filterLoanForm) {
+    filterLoanForm.addEventListener('submit', function(e) {
+      const statusChecked = document.querySelectorAll('input[name="status"]:checked').length;
+      if (!statusChecked) {
+        e.preventDefault();
+        alert('Selecione pelo menos um status.');
+      }
+    });
+  }
+});
 </script>
 
 <style>
@@ -233,6 +326,22 @@
 
   .fa-circle {
     font-size: 0.8rem;
+  }
+
+  /* Search bar, button, and inputs */
+  .input-group, .form-control, .form-check-input {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .input-group:focus-within, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(225, 113, 34, 0.2) !important;
+  }
+
+  .form-check-input {
+    background-color: #faf8e9;
+    border: 1px solid #e0a673;
+    border-radius: 8px;
+    color: #040404;
   }
 
   /* Search bar and buttons */
@@ -277,19 +386,24 @@
     opacity: 0.5;
   }
 
+  /* Badge */
+  .badge {
+    font-size: 0.75rem;
+  }
+
   /* Modal */
   .modal-content {
     border-radius: 12px;
   }
 
-  .form-control, .form-select {
+  .form-control, .form-select, .form-check-input {
     background-color: #faf8e9;
     border: 1px solid #e0a673;
     border-radius: 8px;
     color: #040404;
   }
 
-  .form-control:focus, .form-select:focus {
+  .form-control:focus, .form-select:focus, .form-check-input:focus {
     border-color: #e17122;
     box-shadow: 0 0 0 3px rgba(225, 113, 34, 0.2);
   }
